@@ -68,7 +68,7 @@ module Fieldhand
     describe '#records' do
       it 'returns all records for this repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc', 'list_records_1.xml')
-        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc&resumptionToken=foobar', 'list_records_2.xml')
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&resumptionToken=foobar', 'list_records_2.xml')
         repository = described_class.new('http://www.example.com/oai')
         records = repository.records('oai_dc').to_a
 
@@ -94,6 +94,23 @@ module Fieldhand
                                           :datestamp => Time.xmlschema('2011-03-04T14:18:47Z'),
                                           :sets => %w[BL BL.WAP])
       end
+
+      it 'supports passing extra arguments to the request' do
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2001-01-01&until=2002-01-01', 'list_records_2.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        repository.records('oai_dc', 'from' => '2001-01-01', 'until' => '2002-01-01')
+      end
+    end
+
+    describe '#identifiers' do
+      it 'returns all headers from the repository' do
+        stub_oai_request('http://www.example.com/oai?verb=ListIdentifiers&metadataPrefix=oai_dc', 'list_identifiers.xml')
+        repository = described_class.new('http://www.example.com/oai')
+        headers = repository.identifiers('oai_dc').to_a
+
+        expect(headers.size).to eq(2)
+      end
     end
 
     describe '#identify' do
@@ -118,6 +135,15 @@ module Fieldhand
         repository = described_class.new('https://www.example.com/oai')
 
         expect(repository.identify).not_to be_nil
+      end
+    end
+
+    describe '#record' do
+      it 'fetches the record by identifier' do
+        stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356', 'get_record.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.record('oai:oai.datacite.org:32356', 'oai_dc')).to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
       end
     end
   end

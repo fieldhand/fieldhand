@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-05T21:01:42Z</responseDate>
+  <request verb="GetRecord" metadataPrefix="oai_dc" identifier="oai:oai.datacite.org:32356">http://www.example.com/oai</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai:oai.datacite.org:32356</identifier>
+        <datestamp>2011-07-07T11:19:04Z</datestamp>
+        <setSpec>TIB</setSpec>
+        <setSpec>TIB.DAGST</setSpec>
+      </header>
+      <metadata>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Implementation of Axiomatic Language </dc:title>
+          <dc:creator>Wilson, Walter W.</dc:creator>
+          <dc:publisher>Schloss Dagstuhl - Leibniz-Zentrum fuer Informatik GmbH, Wadern/Saarbruecken, Germany</dc:publisher>
+          <dc:date>2011</dc:date>
+          <dc:identifier>doi:10.4230/LIPIcs.ICLP.2011.290</dc:identifier>
+          <dc:subject>Computer Science</dc:subject>
+          <dc:subject>000 Computer science, knowledge, general works</dc:subject>
+          <dc:description>Other</dc:description>
+          <dc:description>
+ 	This report summarizes a PhD research effort to implement a type of logic programming language called "axiomatic language". Axiomatic language is intended as a specification language, so its implementation involves the transformation of specifications to efficient algorithms. The language is described and the implementation task is discussed.
+ 	</dc:description>
+          <dc:contributor>Herbstritt, Marc</dc:contributor>
+          <dc:language>eng</dc:language>
+          <dc:type>Text</dc:type>
+          <dc:type>ConferencePaper</dc:type>
+          <dc:format>6 pages</dc:format>
+          <dc:format>application/pdf</dc:format>
+          <dc:rights>Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported license (CC-BY-NC-ND)</dc:rights>
+        </oai_dc:dc>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

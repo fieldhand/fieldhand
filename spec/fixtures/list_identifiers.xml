@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-05T20:51:59Z</responseDate>
+  <request verb="ListIdentifiers" metadataPrefix="oai_dc">http://oai.datacite.org/oai</request>
+  <ListIdentifiers>
+    <header status="deleted">
+      <identifier>oai:oai.datacite.org:22</identifier>
+      <datestamp>2011-03-03T16:29:24Z</datestamp>
+      <setSpec>BL</setSpec>
+      <setSpec>BL.WAP</setSpec>
+    </header>
+    <header>
+      <identifier>oai:oai.datacite.org:32356</identifier>
+      <datestamp>2011-07-07T11:19:04Z</datestamp>
+      <setSpec>TIB</setSpec>
+      <setSpec>TIB.DAGST</setSpec>
+    </header>
+    <resumptionToken expirationDate="2017-05-05T21:51:59Z" completeListSize="2" cursor="0"/>
+  </ListIdentifiers>
+</OAI-PMH>

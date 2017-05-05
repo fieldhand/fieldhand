@@ -12,6 +12,9 @@ require 'fieldhand'
 
 repository = Fieldhand::Repository.new('http://example.com/oai')
 
+repository.identify.name
+#=> "Repository Name"
+
 repository.metadata_formats.each do |format|
   puts format.prefix
 end
@@ -22,6 +25,10 @@ end
 
 repository.records('oai_dc').each do |record|
   puts record.identifier
+end
+
+repository.identifiers('oai_dc').each do |header|
+  puts header.identifier
 end
 ```
 

@@ -29,7 +29,7 @@ module Fieldhand
         resumption_token = document.locate("OAI-PMH/#{verb}/resumptionToken[0]").first
         break unless resumption_token && resumption_token.text
 
-        query.update('resumptionToken' => resumption_token.text)
+        query = { 'verb' => verb, 'resumptionToken' => resumption_token.text }
       end
     end
 
