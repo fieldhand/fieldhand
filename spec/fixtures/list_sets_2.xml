@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-05T14:28:04Z</responseDate>
+  <request verb="ListSets">http://example.com/oai</request>
+  <ListSets>
+    <set>
+      <setSpec>B</setSpec>
+      <setName>Set B.</setName>
+    </set>
+    <resumptionToken completeListSize="2" cursor="0"/>
+  </ListSets>
+</OAI-PMH>

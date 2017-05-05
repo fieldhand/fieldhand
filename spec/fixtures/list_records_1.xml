@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-05T14:48:37Z</responseDate>
+  <request verb="ListRecords" metadataPrefix="oai_dc">http://oai.datacite.org/oai</request>
+  <ListRecords>
+    <record>
+      <header>
+        <identifier>oai:oai.datacite.org:32355</identifier>
+        <datestamp>2011-07-07T11:19:03Z</datestamp>
+        <setSpec>TIB</setSpec>
+        <setSpec>TIB.DAGST</setSpec>
+      </header>
+      <metadata>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Accepting the natural order of rules in a logic program with preferences</dc:title>
+          <dc:creator>imko, Alexander</dc:creator>
+          <dc:publisher>Schloss Dagstuhl - Leibniz-Zentrum fuer Informatik GmbH, Wadern/Saarbruecken, Germany</dc:publisher>
+          <dc:date>2011</dc:date>
+          <dc:identifier>doi:10.4230/LIPIcs.ICLP.2011.284</dc:identifier>
+          <dc:subject>Computer Science</dc:subject>
+          <dc:subject>000 Computer science, knowledge, general works</dc:subject>
+          <dc:description>Other</dc:description>
+          <dc:description>
+ 	Preference is a natural part of common sense reasoning. It allows us to select preferred conclusions from broader range of alternative conclusions. It is typically specified on parts of conclusions or on rules. Different semantics have been proposed that deal with preference on rules. None fully meets our requirements.
+ We are interested in a descriptive approach to preference handling in logic programs under answer set semantics that always selects preferred answer set when standard one exists. Existing semantics that meet this criterion also give non intuitive conclusions on some programs. We think this kind of problem is related to the problem of not accepting natural order of rules induced by underlying answer set semantics.
+ Our goal is to define semantics that would always select preferred answer set when standard one exists, accept natural order on rules, and satisfy principles for preference handling.
+ 	</dc:description>
+          <dc:contributor>Herbstritt, Marc</dc:contributor>
+          <dc:language>eng</dc:language>
+          <dc:type>Text</dc:type>
+          <dc:type>ConferencePaper</dc:type>
+          <dc:format>6 pages</dc:format>
+          <dc:format>application/pdf</dc:format>
+          <dc:rights>Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported license (CC-BY-NC-ND)</dc:rights>
+        </oai_dc:dc>
+      </metadata>
+    </record>
+    <record>
+      <header status="deleted">
+        <identifier>oai:oai.datacite.org:22</identifier>
+        <datestamp>2011-03-03T16:29:24Z</datestamp>
+        <setSpec>BL</setSpec>
+        <setSpec>BL.WAP</setSpec>
+      </header>
+    </record>
+    <resumptionToken expirationDate="2017-05-05T15:48:37Z" completeListSize="4" cursor="0">foobar</resumptionToken>
+  </ListRecords>
+</OAI-PMH>
