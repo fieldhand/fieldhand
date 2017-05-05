@@ -95,5 +95,30 @@ module Fieldhand
                                           :sets => %w[BL BL.WAP])
       end
     end
+
+    describe '#identify' do
+      it 'returns information about the repository' do
+        stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml')
+        repository = described_class.new('http://www.example.com/oai')
+        identify = repository.identify
+
+        expect(identify).to have_attributes(:name => 'DataCite MDS',
+                                            :base_url => 'http://oai.datacite.org/oai',
+                                            :protocol_version => '2.0',
+                                            :earliest_datestamp => Time.xmlschema('2011-01-01T00:00:00Z'),
+                                            :deleted_record => 'persistent',
+                                            :granularity => 'YYYY-MM-DDThh:mm:ssZ',
+                                            :admin_emails => %w[admin@datacite.org],
+                                            :compression_encodings => %w[gzip deflate])
+
+      end
+
+      it 'supports HTTPS repositories' do
+        stub_oai_request('https://www.example.com/oai?verb=Identify', 'identify.xml')
+        repository = described_class.new('https://www.example.com/oai')
+
+        expect(repository.identify).not_to be_nil
+      end
+    end
   end
 end

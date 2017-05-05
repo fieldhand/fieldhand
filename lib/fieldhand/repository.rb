@@ -2,6 +2,7 @@ require 'fieldhand/paginator'
 require 'fieldhand/metadata_format'
 require 'fieldhand/set'
 require 'fieldhand/record'
+require 'fieldhand/identify'
 
 module Fieldhand
   class Repository
@@ -11,10 +12,16 @@ module Fieldhand
       @uri = uri.is_a?(URI) ? uri : URI(uri)
     end
 
+    def identify
+      paginator.items('Identify', 'Identify').map { |identify|
+        Identify.from(identify)
+      }.first
+    end
+
     def metadata_formats
       return enum_for(:metadata_formats) unless block_given?
 
-      paginator.items('ListMetadataFormats', 'metadataFormat').each do |format|
+      paginator.items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat').each do |format|
         yield MetadataFormat.from(format)
       end
     end
@@ -22,7 +29,7 @@ module Fieldhand
     def sets
       return enum_for(:sets) unless block_given?
 
-      paginator.items('ListSets', 'set').each do |set|
+      paginator.items('ListSets', 'ListSets/set').each do |set|
         yield Set.from(set)
       end
     end
@@ -30,7 +37,7 @@ module Fieldhand
     def records(metadata_prefix)
       return enum_for(:records, metadata_prefix) unless block_given?
 
-      paginator.items('ListRecords', 'record', 'metadataPrefix' => metadata_prefix).each do |record|
+      paginator.items('ListRecords', 'ListRecords/record', 'metadataPrefix' => metadata_prefix).each do |record|
         yield Record.from(record)
       end
     end

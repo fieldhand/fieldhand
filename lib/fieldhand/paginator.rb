@@ -7,20 +7,22 @@ module Fieldhand
   NetworkError = Class.new(StandardError)
 
   class Paginator
-    attr_reader :uri
+    attr_reader :uri, :http
 
     def initialize(uri)
       @uri = uri.is_a?(URI) ? uri : URI(uri)
+      @http = Net::HTTP.new(uri.host, uri.port)
+      @http.use_ssl = true if uri.scheme == 'https'
     end
 
-    def items(verb, tag, query = {})
-      return enum_for(:items, verb, tag, query) unless block_given?
+    def items(verb, path, query = {})
+      return enum_for(:items, verb, path, query) unless block_given?
 
       query.update('verb' => verb)
 
       loop do
         document = Ox.parse(request(query))
-        document.root.locate("#{verb}/#{tag}").each do |item|
+        document.root.locate(path).each do |item|
           yield item
         end
 
@@ -35,9 +37,13 @@ module Fieldhand
 
     def request(query = {})
       request_uri = uri.dup
-      request_uri.query = query.map { |k, v| [CGI.escape(k), CGI.escape(v)].join('=') }.join('&')
+      request_uri.query = query.map { |k, v|
+        str = CGI.escape(k)
+        str << '='
+        str << CGI.escape(v)
+      }.join('&')
 
-      Net::HTTP.get(request_uri)
+      http.get(request_uri.request_uri).body
     rescue StandardError, ::Timeout::Error => e
       raise NetworkError, "error requesting #{query}: #{e}"
     end
