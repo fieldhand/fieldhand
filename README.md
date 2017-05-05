@@ -25,6 +25,10 @@ repository.records('oai_dc').each do |record|
 end
 ```
 
+## Acknowledgements
+
+* Example XML responses are taken from [Datacite's OAI-PMH repository](https://oai.datacite.org/).
+
 ## License
 
 Copyright © 2017 Altmetric LLP
