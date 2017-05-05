@@ -8,30 +8,30 @@ module Fieldhand
     attr_reader :uri
 
     def initialize(uri)
-      @uri = URI(uri)
+      @uri = uri.is_a?(URI) ? uri : URI(uri)
     end
 
     def metadata_formats
-      Enumerator.new do |yielder|
-        paginator.items('ListMetadataFormats', 'metadataFormat').each do |format|
-          yielder << MetadataFormat.from(format)
-        end
+      return enum_for(:metadata_formats) unless block_given?
+
+      paginator.items('ListMetadataFormats', 'metadataFormat').each do |format|
+        yield MetadataFormat.from(format)
       end
     end
 
     def sets
-      Enumerator.new do |yielder|
-        paginator.items('ListSets', 'set').each do |set|
-          yielder << Set.from(set)
-        end
+      return enum_for(:sets) unless block_given?
+
+      paginator.items('ListSets', 'set').each do |set|
+        yield Set.from(set)
       end
     end
 
     def records(metadata_prefix)
-      Enumerator.new do |yielder|
-        paginator.items('ListRecords', 'record', 'metadataPrefix' => metadata_prefix).each do |record|
-          yielder << Record.from(record)
-        end
+      return enum_for(:records, metadata_prefix) unless block_given?
+
+      paginator.items('ListRecords', 'record', 'metadataPrefix' => metadata_prefix).each do |record|
+        yield Record.from(record)
       end
     end
 
