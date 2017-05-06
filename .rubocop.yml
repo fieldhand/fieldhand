@@ -1,0 +1,14 @@
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+Style/DotPosition:
+  EnforcedStyle: trailing
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+Metrics/LineLength:
+  Max: 120
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*.rb
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*.rb

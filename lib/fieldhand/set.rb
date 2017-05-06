@@ -1,10 +1,20 @@
 module Fieldhand
-  Set = Struct.new(:spec, :name) do
-    def self.from(element)
-      spec = element.setSpec.text
-      name = element.setName.text
+  # A set is an optional construct for grouping items for the purpose of selective harvesting.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Set
+  class Set
+    attr_reader :element
 
-      new(spec, name)
+    def initialize(element)
+      @element = element
+    end
+
+    def spec
+      @spec ||= element.setSpec.text
+    end
+
+    def name
+      @name ||= element.setName.text
     end
   end
 end

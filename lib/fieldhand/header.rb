@@ -1,12 +1,38 @@
-module Fieldhand
-  Header = Struct.new(:status, :identifier, :datestamp, :sets) do
-    def self.from(element)
-      status = element['status']
-      identifier = element.identifier.text
-      datestamp = Time.xmlschema(element.datestamp.text)
-      sets = element.locate('setSpec').map(&:text)
+require 'time'
 
-      new(status, identifier, datestamp, sets)
+module Fieldhand
+  # Contains the unique identifier of the item and properties necessary for selective harvesting. The header consists of
+  # the following parts:
+  #
+  # * the unique identifier -- the unique identifier of an item in a repository;
+  # * the datestamp -- the date of creation, modification or deletion of the record for the purpose of selective
+  #   harvesting.
+  # * zero or more setSpec elements -- the set membership of the item for the purpose of selective harvesting.
+  # * an optional status attribute with a value of deleted indicates the withdrawal of availability of the specified
+  #   metadata format for the item, dependent on the repository support for deletions.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#header
+  class Header
+    attr_reader :element
+
+    def initialize(element)
+      @element = element
+    end
+
+    def status
+      element['status']
+    end
+
+    def identifier
+      @identifier ||= element.identifier.text
+    end
+
+    def datestamp
+      @datestamp ||= Time.xmlschema(element.datestamp.text)
+    end
+
+    def sets
+      @sets ||= element.nodes.select { |node| node.is_a?(::Ox::Element) && node.value == 'setSpec' }.map(&:text)
     end
   end
 end

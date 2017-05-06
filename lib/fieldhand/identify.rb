@@ -1,19 +1,50 @@
 require 'time'
 
 module Fieldhand
-  Identify = Struct.new(:name, :base_url, :protocol_version, :earliest_datestamp, :deleted_record, :granularity, :admin_emails, :compression_encodings, :descriptions) do
-    def self.from(element)
-      name = element.repositoryName.text
-      base_url = element.baseURL.text
-      protocol_version = element.protocolVersion.text
-      earliest_datestamp = Time.xmlschema(element.earliestDatestamp.text)
-      deleted_record = element.deletedRecord.text
-      granularity = element.granularity.text
-      admin_emails = element.locate('adminEmail').map(&:text)
-      compression_encodings = element.locate('compression').map(&:text)
-      descriptions = element.locate('description')
+  # Information about a repository.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
+  class Identify
+    attr_reader :element
 
-      new(name, base_url, protocol_version, earliest_datestamp, deleted_record, granularity, admin_emails, compression_encodings, descriptions)
+    def initialize(element)
+      @element = element
+    end
+
+    def name
+      @name ||= element.repositoryName.text
+    end
+
+    def base_url
+      @base_url ||= element.baseURL.text
+    end
+
+    def protocol_version
+      @protocol_version ||= element.protocolVersion.text
+    end
+
+    def earliest_datestamp
+      @earliest_datestamp ||= Time.xmlschema(element.earliestDatestamp.text)
+    end
+
+    def deleted_record
+      @deleted_record ||= element.deletedRecord.text
+    end
+
+    def granularity
+      @granularity ||= element.granularity.text
+    end
+
+    def admin_emails
+      @admin_emails ||= element.locate('adminEmail').map(&:text)
+    end
+
+    def compression_encodings
+      @compression_encodings ||= element.locate('compression').map(&:text)
+    end
+
+    def descriptions
+      @descriptions ||= element.locate('description')
     end
   end
 end

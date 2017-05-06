@@ -6,6 +6,10 @@ require 'uri'
 module Fieldhand
   NetworkError = Class.new(StandardError)
 
+  # An abstraction over interactions with an OAI-PMH repository, handling requests, responses and paginating over
+  # results using a resumption token.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
     attr_reader :uri, :http
 
@@ -18,10 +22,8 @@ module Fieldhand
     def items(verb, path, query = {})
       return enum_for(:items, verb, path, query) unless block_given?
 
-      query.update('verb' => verb)
-
       loop do
-        document = Ox.parse(request(query))
+        document = Ox.parse(request(query.merge('verb' => verb)))
         document.root.locate(path).each do |item|
           yield item
         end
@@ -29,7 +31,7 @@ module Fieldhand
         resumption_token = document.locate("OAI-PMH/#{verb}/resumptionToken[0]").first
         break unless resumption_token && resumption_token.text
 
-        query = { 'verb' => verb, 'resumptionToken' => resumption_token.text }
+        query = { 'resumptionToken' => resumption_token.text }
       end
     end
 
@@ -37,15 +39,17 @@ module Fieldhand
 
     def request(query = {})
       request_uri = uri.dup
-      request_uri.query = query.map { |k, v|
-        str = CGI.escape(k)
-        str << '='
-        str << CGI.escape(v)
-      }.join('&')
+      request_uri.query = encode_query(query)
 
       http.get(request_uri.request_uri).body
-    rescue StandardError, ::Timeout::Error => e
+    rescue ::Timeout::Error => e
+      raise NetworkError, "timeout requesting #{query}: #{e}"
+    rescue => e
       raise NetworkError, "error requesting #{query}: #{e}"
+    end
+
+    def encode_query(query = {})
+      query.map { |k, v| CGI.escape(k) << '=' << CGI.escape(v) }.join('&')
     end
   end
 end

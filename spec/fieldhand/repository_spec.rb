@@ -6,11 +6,19 @@ module Fieldhand
       it 'returns the supported metadata formats for this repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListMetadataFormats', 'list_metadata_formats.xml')
         repository = described_class.new('http://www.example.com/oai')
-        oai_dc = MetadataFormat.new('oai_dc',
-                                    'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
-                                    'http://www.openarchives.org/OAI/2.0/oai_dc/')
+        formats = repository.metadata_formats.to_a
 
-        expect(repository.metadata_formats).to contain_exactly(oai_dc)
+        expect(formats.size).to eq(1)
+      end
+
+      it 'populates metadata formats with the right information' do
+        stub_oai_request('http://www.example.com/oai?verb=ListMetadataFormats', 'list_metadata_formats.xml')
+        repository = described_class.new('http://www.example.com/oai')
+        format = repository.metadata_formats.first
+
+        expect(format).to have_attributes(:prefix => 'oai_dc',
+                                          :schema => 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+                                          :namespace => 'http://www.openarchives.org/OAI/2.0/oai_dc/')
       end
 
       it 'raises an error if the connection times out' do
@@ -42,19 +50,18 @@ module Fieldhand
       it 'returns the sets for this repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListSets', 'list_sets_2.xml')
         repository = described_class.new('http://www.example.com/oai')
-        set_b = Set.new('B', 'Set B.')
+        set_b = repository.sets.first
 
-        expect(repository.sets).to contain_exactly(set_b)
+        expect(set_b).to have_attributes(:spec => 'B', :name => 'Set B.')
       end
 
       it 'paginates over all sets for this repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListSets', 'list_sets_1.xml')
         stub_oai_request('http://www.example.com/oai?verb=ListSets&resumptionToken=foobar', 'list_sets_2.xml')
         repository = described_class.new('http://www.example.com/oai')
-        set_a = Set.new('A', 'Set A.')
-        set_b = Set.new('B', 'Set B.')
+        sets = repository.sets.to_a
 
-        expect(repository.sets).to contain_exactly(set_a, set_b)
+        expect(sets.size).to eq(2)
       end
 
       it 'raises an error if the connection times out while consuming' do
@@ -96,7 +103,8 @@ module Fieldhand
       end
 
       it 'supports passing extra arguments to the request' do
-        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2001-01-01&until=2002-01-01', 'list_records_2.xml')
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2001-01-01&until=2002-01-01',
+                         'list_records_2.xml')
         repository = described_class.new('http://www.example.com/oai')
 
         repository.records('oai_dc', 'from' => '2001-01-01', 'until' => '2002-01-01')
@@ -105,7 +113,8 @@ module Fieldhand
 
     describe '#identifiers' do
       it 'returns all headers from the repository' do
-        stub_oai_request('http://www.example.com/oai?verb=ListIdentifiers&metadataPrefix=oai_dc', 'list_identifiers.xml')
+        stub_oai_request('http://www.example.com/oai?verb=ListIdentifiers&metadataPrefix=oai_dc',
+                         'list_identifiers.xml')
         repository = described_class.new('http://www.example.com/oai')
         headers = repository.identifiers('oai_dc').to_a
 
@@ -127,7 +136,6 @@ module Fieldhand
                                             :granularity => 'YYYY-MM-DDThh:mm:ssZ',
                                             :admin_emails => %w[admin@datacite.org],
                                             :compression_encodings => %w[gzip deflate])
-
       end
 
       it 'supports HTTPS repositories' do
@@ -140,10 +148,12 @@ module Fieldhand
 
     describe '#record' do
       it 'fetches the record by identifier' do
-        stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356', 'get_record.xml')
+        stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356',
+                         'get_record.xml')
         repository = described_class.new('http://www.example.com/oai')
 
-        expect(repository.record('oai:oai.datacite.org:32356', 'oai_dc')).to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
+        expect(repository.record('oai:oai.datacite.org:32356', 'oai_dc')).
+          to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
       end
     end
   end

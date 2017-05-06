@@ -1,15 +1,36 @@
-require 'time'
-
 module Fieldhand
-  Record = Struct.new(:status, :identifier, :datestamp, :sets, :metadata) do
-    def self.from(element)
-      status = element.header['status']
-      identifier = element.header.identifier.text
-      datestamp = Time.xmlschema(element.header.datestamp.text)
-      sets = element.header.locate('setSpec').map(&:text)
-      metadata = element.locate('metadata').first
+  # A record is metadata expressed in a single format.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Record
+  class Record
+    attr_reader :element
 
-      new(status, identifier, datestamp, sets, metadata)
+    def initialize(element)
+      @element = element
+    end
+
+    def status
+      header.status
+    end
+
+    def identifier
+      header.identifier
+    end
+
+    def datestamp
+      header.datestamp
+    end
+
+    def sets
+      header.sets
+    end
+
+    def metadata
+      @metadata ||= element.nodes.find { |node| node.is_a?(::Ox::Element) && node.value == 'metadata' }
+    end
+
+    def header
+      @header ||= Header.new(element.header)
     end
   end
 end
