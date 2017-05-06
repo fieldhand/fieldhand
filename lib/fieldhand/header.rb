@@ -32,7 +32,7 @@ module Fieldhand
     end
 
     def sets
-      @sets ||= element.nodes.select { |node| node.is_a?(::Ox::Element) && node.value == 'setSpec' }.map(&:text)
+      @sets ||= element.locate('setSpec/^String')
     end
   end
 end

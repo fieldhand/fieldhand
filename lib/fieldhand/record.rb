@@ -26,7 +26,7 @@ module Fieldhand
     end
 
     def metadata
-      @metadata ||= element.nodes.find { |node| node.is_a?(::Ox::Element) && node.value == 'metadata' }
+      @metadata ||= element.locate('metadata[0]').first
     end
 
     def header
