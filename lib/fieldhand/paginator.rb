@@ -1,7 +1,8 @@
 require 'cgi'
 require 'net/http'
-require 'ox'
 require 'uri'
+require 'ox'
+require 'fieldhand/logger'
 
 module Fieldhand
   NetworkError = Class.new(StandardError)
@@ -11,10 +12,11 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :http
+    attr_reader :uri, :logger, :http
 
-    def initialize(uri)
+    def initialize(uri, logger = Logger.null)
       @uri = uri.is_a?(URI) ? uri : URI(uri)
+      @logger = logger
       @http = Net::HTTP.new(uri.host, uri.port)
       @http.use_ssl = true if uri.scheme == 'https'
     end
@@ -28,10 +30,11 @@ module Fieldhand
           yield item
         end
 
-        resumption_token = document.locate("OAI-PMH/#{verb}/resumptionToken[0]").first
-        break unless resumption_token && resumption_token.text
+        resumption_token = document.root.locate('?/resumptionToken/^String').first
+        break unless resumption_token
 
-        query = { 'resumptionToken' => resumption_token.text }
+        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{resumption_token}" }
+        query = { 'resumptionToken' => resumption_token }
       end
     end
 
@@ -41,6 +44,7 @@ module Fieldhand
       request_uri = uri.dup
       request_uri.query = encode_query(query)
 
+      logger.info('Fieldhand') { "GET #{request_uri}" }
       http.get(request_uri.request_uri).body
     rescue ::Timeout::Error => e
       raise NetworkError, "timeout requesting #{query}: #{e}"

@@ -36,11 +36,11 @@ module Fieldhand
     end
 
     def admin_emails
-      @admin_emails ||= element.locate('adminEmail').map(&:text)
+      @admin_emails ||= element.locate('adminEmail/^String')
     end
 
     def compression_encodings
-      @compression_encodings ||= element.locate('compression').map(&:text)
+      @compression_encodings ||= element.locate('compression/^String')
     end
 
     def descriptions

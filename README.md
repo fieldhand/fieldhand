@@ -11,6 +11,8 @@ A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.o
 require 'fieldhand'
 
 repository = Fieldhand::Repository.new('http://example.com/oai')
+# or, if you want to log information to STDOUT
+repository = Fieldhand::Repository.new('http://example.com/oai', Logger.new(STDOUT))
 
 repository.identify.name
 #=> "Repository Name"
@@ -35,6 +37,7 @@ end
 ## Acknowledgements
 
 * Example XML responses are taken from [Datacite's OAI-PMH repository](https://oai.datacite.org/).
+* Null device detection is based on the implementation from the [backports](https://github.com/marcandre/backports) gem.
 
 ## License
 

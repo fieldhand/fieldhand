@@ -146,13 +146,13 @@ module Fieldhand
       end
     end
 
-    describe '#record' do
+    describe '#get' do
       it 'fetches the record by identifier' do
         stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356',
                          'get_record.xml')
         repository = described_class.new('http://www.example.com/oai')
 
-        expect(repository.record('oai:oai.datacite.org:32356', 'oai_dc')).
+        expect(repository.get('oai:oai.datacite.org:32356', 'oai_dc')).
           to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
       end
     end
