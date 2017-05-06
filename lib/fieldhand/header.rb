@@ -19,6 +19,10 @@ module Fieldhand
       @element = element
     end
 
+    def deleted?
+      status == 'deleted'
+    end
+
     def status
       element['status']
     end
@@ -28,7 +32,7 @@ module Fieldhand
     end
 
     def datestamp
-      @datestamp ||= Time.xmlschema(element.datestamp.text)
+      @datestamp ||= ::Time.xmlschema(element.datestamp.text)
     end
 
     def sets

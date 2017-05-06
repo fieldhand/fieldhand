@@ -1,3 +1,5 @@
+require 'fieldhand/header'
+
 module Fieldhand
   # A record is metadata expressed in a single format.
   #
@@ -7,6 +9,10 @@ module Fieldhand
 
     def initialize(element)
       @element = element
+    end
+
+    def deleted?
+      header.deleted?
     end
 
     def status

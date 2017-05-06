@@ -8,13 +8,14 @@ require 'fieldhand/set'
 require 'uri'
 
 module Fieldhand
-  # A repository is a network accessible server that can process the 6 OAI-PMH requests in the manner described in
-  # https://www.openarchives.org/OAI/openarchivesprotocol.html
+  # A repository is a network accessible server that can process the 6 OAI-PMH requests.
+  #
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html
   class Repository
     attr_reader :uri, :logger
 
     def initialize(uri, logger = Logger.null)
-      @uri = uri.is_a?(URI) ? uri : URI(uri)
+      @uri = uri.is_a?(::URI) ? uri : URI(uri)
       @logger = logger
     end
 
@@ -45,21 +46,21 @@ module Fieldhand
         end
     end
 
-    def records(metadata_prefix, query = {})
-      return enum_for(:records, metadata_prefix, query) unless block_given?
+    def records(metadata_prefix, arguments = {})
+      return enum_for(:records, metadata_prefix, arguments) unless block_given?
 
       paginator.
-        items('ListRecords', 'ListRecords/record', query.merge('metadataPrefix' => metadata_prefix)).
+        items('ListRecords', 'ListRecords/record', arguments.merge('metadataPrefix' => metadata_prefix)).
         each do |record|
           yield Record.new(record)
         end
     end
 
-    def identifiers(metadata_prefix, query = {})
-      return enum_for(:identifiers, metadata_prefix, query) unless block_given?
+    def identifiers(metadata_prefix, arguments = {})
+      return enum_for(:identifiers, metadata_prefix, arguments) unless block_given?
 
       paginator.
-        items('ListIdentifiers', 'ListIdentifiers/header', query.merge('metadataPrefix' => metadata_prefix)).
+        items('ListIdentifiers', 'ListIdentifiers/header', arguments.merge('metadataPrefix' => metadata_prefix)).
         each do |header|
           yield Header.new(header)
         end

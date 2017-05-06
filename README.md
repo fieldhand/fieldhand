@@ -2,7 +2,7 @@
 
 A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) repositories.
 
-**Current version:** 0.1.0  
+**Current version:** Unreleased  
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0, 2.1, 2.2
 
 ## Usage
@@ -11,33 +11,440 @@ A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.o
 require 'fieldhand'
 
 repository = Fieldhand::Repository.new('http://example.com/oai')
-# or, if you want to log information to STDOUT
-repository = Fieldhand::Repository.new('http://example.com/oai', Logger.new(STDOUT))
-
 repository.identify.name
 #=> "Repository Name"
 
-repository.metadata_formats.each do |format|
-  puts format.prefix
-end
+repository.metadata_formats.map { |format| format.prefix }
+#=> ["oai_dc"]
 
-repository.sets.each do |set|
-  puts set.name
-end
+repository.sets.map { |set| set.name }
+#=> ["Set A.", "Set B."]
 
 repository.records('oai_dc').each do |record|
-  puts record.identifier
+  # ...
 end
 
-repository.identifiers('oai_dc').each do |header|
-  puts header.identifier
-end
+repository.get('oai:www.example.com:12345', 'oai_dc')
+#=> #<Fieldhand::Record: ...>
 ```
+
+## API Documentation
+
+* [`Fieldhand::Repository`](#fieldhandrepository)
+  * [`.new(uri[, logger])`](#fieldhandrepositorynewuri-logger)
+  * [`#identify`](#fieldhandrepositoryidentify)
+  * [`#metadata_formats`](#fieldhandrepositorymetadata_formats)
+  * [`#sets`](#fieldhandrepositorysets)
+  * [`#records(metadata_prefix[, arguments])`](#fieldhandrepositoryrecordsmetadata_prefix-arguments)
+  * [`#identifiers(metadata_prefix[, arguments])`](#fieldhandrepositoryidentifiersmetadata_prefix-arguments)
+  * [`#get(identifier, metadata_prefix)`](#fieldhandgetidentifier-metadata_prefix)
+* [`Fieldhand::Identify`](#fieldhandidentify)
+  * [`#name`](#fieldhandidentifyname)
+  * [`#base_url`](#fieldhandidentifybase_url)
+  * [`#protocol_version`](#fieldhandidentifyprotocol_version)
+  * [`#earliest_datestamp`](#fieldhandidentifyearliest_datestamp)
+  * [`#deleted_record`](#fieldhandidentifydeleted_record)
+  * [`#granularity`](#fieldhandidentifygranularity)
+  * [`#admin_emails`](#fieldhandidentifyadmin_emails)
+  * [`#compression_encodings`](#fieldhandidentifycompression_encodings)
+  * [`#descriptions`](#fieldhandidentifydescriptions)
+* [`Fieldhand::MetadataFormat`](#fieldhandmetadataformat)
+  * [`#prefix`](#fieldhandmetadataformatprefix)
+  * [`#schema`](#fieldhandmetadataformatschema)
+  * [`#namespace`](#fieldhandmetadataformatnamespace)
+* [`Fieldhand::Set`](#fieldhandset)
+  * [`#spec`](#fieldhandsetspec)
+  * [`#name`](#fieldhandsetname)
+* [`Fieldhand::Record`](#fieldhandrecord)
+  * [`#deleted?`](#fieldhandrecorddeleted)
+  * [`#status`](#fieldhandrecordstatus)
+  * [`#identifier`](#fieldhandrecordidentifier)
+  * [`#datestamp`](#fieldhandrecorddatestamp)
+  * [`#sets`](#fieldhandrecordsets)
+  * [`#metadata`](#fieldhandrecordmetadata)
+* [`Fieldhand::Header`](#fieldhandheader)
+  * [`#deleted?`](#fieldhandheaderdeleted)
+  * [`#status`](#fieldhandheaderstatus)
+  * [`#identifier`](#fieldhandheaderidentifier)
+  * [`#datestamp`](#fieldhandheaderdatestamp)
+  * [`#sets`](#fieldhandheadersets)
+* [`Fieldhand::NetworkError`](#fieldhandnetworkerror)
+
+### `Fieldhand::Repository`
+
+A class to represent [an OAI-PMH repository](https://www.openarchives.org/OAI/openarchivesprotocol.html#Repository):
+
+> A repository is a network accessible server that can process the 6 OAI-PMH
+> requests [...]. A repository is managed by a data provider to expose metadata
+> to harvesters.
+
+#### `Fieldhand::Repository.new(uri[, logger])`
+
+```ruby
+Fieldhand::Repository.new('http://www.example.com/oai')
+Fieldhand::Repository.new(URI('http://www.example.com/oai'))
+Fieldhand::Repository.new('http://www.example.com/oai', Logger.new(STDOUT))
+```
+
+Return a new [`Repository`](#fieldhandrepository) instance accessible at the given `uri` (specified
+either as a [`URI`][URI] or
+something that can be coerced into a `URI` such as a `String`) with an optional
+[`Logger`](http://ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger.html)-compatible
+`logger`.
+
+#### `Fieldhand::Repository#identify`
+
+```ruby
+repository.identify
+#=> #<Fieldhand::Identify: ...>
+```
+
+Return an [`Identify`](#fieldhandidentify) for the repository including information such as the repository name, base URL, protocol version, etc.
+
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+
+#### `Fieldhand::Repository#metadata_formats`
+
+```ruby
+repository.metadata_formats
+#=> #<Enumerator: ...>
+```
+
+Return an [`Enumerator`][Enumerator] of [`MetadataFormat`](#fieldhandmetadataformat)s available from the repository.
+
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+
+#### `Fieldhand::Repository#sets`
+
+```ruby
+repository.sets
+#=> #<Enumerator: ...>
+```
+
+Return an [`Enumerator`][Enumerator] of [`Set`](#fieldhandset)s that represent the set structure of a repository.
+
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+
+#### `Fieldhand::Repository#records(metadata_prefix[, arguments])`
+
+```ruby
+repository.records('oai_dc')
+repository.records('oai_dc', 'from' => '2001-01-01')
+repository.records('oai_dc', 'set' => 'A', 'until' => '2010-01-01')
+```
+
+Return an [`Enumerator`][Enumerator] of all [`Record`](#fieldhandrecord)s with the given `metadata_prefix` harvested from the repository.
+
+Optional arguments can be passed as a `Hash` of `arguments` to permit selective harvesting of records based on set membership and/or datestamp:
+
+* `from`: an optional argument with a `String` [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a lower bound for datestamp-based selective harvesting;
+* `until`: an optional argument with a `String` [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a upper bound for datestamp-based selective harvesting;
+* `set`: an optional argument with a [set spec](#fieldhandsetspec) value, which specifies set criteria for selective harvesting.
+
+Note that datetimes should respect the repository's [granularity](#fieldhandidentifygranularity).
+
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+
+#### `Fieldhand::Repository#identifiers(metadata_prefix[, arguments])`
+
+```ruby
+repository.identifiers('oai_dc')
+repository.identifiers('oai_dc', 'from' => '2001-01-01')
+repository.identifiers('oai_dc', 'set' => 'A', 'until' => '2010-01-01')
+```
+
+Return an [`Enumerator`][Enumerator] for an abbreviated form of [records](#fieldhandrepositoryrecordsmetadata_prefix-arguments), retrieving only [`Header`](#fieldhandheader)s for the given `metadata_prefix` and optional `arguments`.
+
+See [`Fieldhand::Repository#records`](#fieldhandrepositoryrecordsmetadata_prefix-arguments) for supported `arguments`.
+
+#### `Fieldhand::Repository#get(identifier, metadata_prefix)`
+
+```ruby
+repository.get('oai:www.example.com:1', 'oai_dc')
+#=> #<Fieldhand::Record: ...>
+```
+
+Return an individual metadata [`Record`](#fieldhandrecord) from a repository with the given `identifier` and `metadata_prefix`.
+
+### `Fieldhand::Identify`
+
+A class to represent information about a repository as returned from the [`Identify` request](https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify).
+
+#### `Fieldhand::Identify#name`
+
+```ruby
+repository.identify.name
+#=> "Repository Name"
+```
+
+Return a human readable name for the repository as a `String`.
+
+#### `Fieldhand::Identify#base_url`
+
+```ruby
+repository.identify.base_url
+#=> #<URI::HTTP http://www.example.com/oai>
+```
+
+Returns the [base URL](https://www.openarchives.org/OAI/openarchivesprotocol.html#HTTPRequestFormat) of the repository as a [`URI`][URI].
+
+#### `Fieldhand::Identify#protocol_version`
+
+```ruby
+repository.identify.protocol_version
+#=> "2.0"
+```
+
+Returns the version of the OAI-PMH protocol supported by the repository as a `String`.
+
+#### `Fieldhand::Identify#earliest_datestamp`
+
+```ruby
+repository.identify.earliest_datestamp
+#=> 2011-01-01 00:00:00 UTC
+```
+
+Returns the guaranteed lower limit of all datestamps recording changes, modifications, or deletions in the repository as a [`Time`][Time]. Note that the time will be at the finest [granularity](#fieldhandidentifygranularity) supported by the repository.
+
+#### `Fieldhand::Identify#deleted_record`
+
+```ruby
+repository.identify.deleted_record
+#=> "persistent"
+```
+
+Returns the manner in which the repository supports the notion of deleted records as a `String`. Legitimate values are `no`; `transient`; `persistent` with meanings defined in [the section on deletion](https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords).
+
+#### `Fieldhand::Identify#granularity`
+
+```ruby
+repository.identify.granularity
+#=> "YYYY-MM-DDThh:mm:ssZ"
+```
+
+Returns the finest [harvesting granularity](https://www.openarchives.org/OAI/openarchivesprotocol.html#Datestamp) supported by the repository as a `String`. The legitimate values are `YYYY-MM-DD` and `YYYY-MM-DDThh:mm:ssZ` with meanings as defined in [ISO 8601](http://www.w3.org/TR/NOTE-datetime).
+
+#### `Fieldhand::Identify#admin_emails`
+
+```ruby
+repository.identify.admin_emails
+#=> ["admin@example.com"]
+```
+
+Returns the e-mail addresses of administrators of the repository as an `Array` of `String`s.
+
+#### `Fieldhand::Identify#compression_encodings`
+
+```ruby
+repository.identify.compression_encodings
+#=> ["gzip", "deflate"]
+```
+
+Returns the compression encodings supported by the repository as an `Array` of `String`s. The recommended values are those defined for the Content-Encoding header in Section 14.11 of [RFC 2616](http://www.ietf.org/rfc/rfc2616.txt) describing HTTP 1.1
+
+#### `Fieldhand::Identify#descriptions`
+
+```ruby
+repository.identify.descriptions
+#=> [#<Ox::Element...>]
+```
+
+Returns XML elements describing this repository as an `Array` of [`Ox::Element`][Element]s.
+
+As descriptions can be in any format, Fieldhand doesn't attempt to parse descriptions but leaves parsing to the client.
+
+### `Fieldhand::MetadataFormat`
+
+A class to represent a metadata format available from a repository.
+
+#### `Fieldhand::MetadataFormat#prefix`
+
+```ruby
+repository.metadata_formats.first.prefix
+#=> "oai_dc"
+```
+
+Return the prefix of the metadata format to be used when requesting records as a `String`.
+
+#### `Fieldhand::MetadataFormat#schema`
+
+```ruby
+repository.metadata_formats.first.schema
+#=> #<URI::HTTP http://www.openarchives.org/OAI/2.0/oai_dc.xsd>
+```
+
+Return the location of an XML Schema describing the format as a [`URI`][URI].
+
+#### `Fieldhand::MetadataFormat#namespace`
+
+```ruby
+repository.metadata_formats.first.namespace
+#=> #<URI::HTTP http://www.openarchives.org/OAI/2.0/oai_dc/>
+```
+
+Return the XML Namespace URI for the format as a [`URI`][URI].
+
+### `Fieldhand::Set`
+
+A class representing an optional construct for grouping items for the purpose of selective harvesting.
+
+#### `Fieldhand::Set#spec`
+
+```ruby
+repository.sets.first.spec
+#=> "A"
+```
+
+Return unique identifier for the set which is also the path from the root of the set hierarchy to the respective node as a `String`.
+
+#### `Fieldhand::Set#name`
+
+```ruby
+repository.sets.first.name
+#=> "Set A."
+```
+
+Return a short human-readable `String` naming the set.
+
+### `Fieldhand::Record`
+
+A class representing a [record](https://www.openarchives.org/OAI/openarchivesprotocol.html#Record) from the repository:
+
+> A record is metadata expressed in a single format.
+
+#### `Fieldhand::Record#deleted?`
+
+```ruby
+repository.records('oai_dc').first.deleted?
+#=> true
+```
+
+Return whether or not a record is [deleted](https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords) as a `Boolean`.
+
+#### `Fieldhand::Record#status`
+
+```ruby
+repository.records('oai_dc').first.status
+#=> "deleted"
+```
+
+Return the optional `status` attribute of the [record's header](https://www.openarchives.org/OAI/openarchivesprotocol.html#header) as a `String` or `nil`.
+
+> [A] value of deleted indicates the withdrawal of availability of the specified metadata format for the item, dependent on the repository support for deletions.
+
+#### `Fieldhand::Record#identifier`
+
+```ruby
+repository.records('oai_dc').first.identifier
+#=> "oai:www.example.com:1"
+```
+
+Return the [unique identifier](https://www.openarchives.org/OAI/openarchivesprotocol.html#UniqueIdentifier) for this record in the repository.
+
+#### `Fieldhand::Record#datestamp`
+
+```ruby
+repository.records('oai_dc').first.datestamp
+#=> 2011-03-03 16:29:24 UTC
+```
+
+Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time].
+
+#### `Fieldhand::Record#sets`
+
+```ruby
+repository.records('oai_dc').first.sets
+#=> ["A", "B"]
+```
+
+Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memberships of this record.
+
+#### `Fieldhand::Record#metadata`
+
+```ruby
+repository.records('oai_dc').first.metadata
+#=> #<Ox::Element: ...>
+```
+
+Return a single manifestation of the metadata from a record as [`Ox::Element`][Element]s or `nil` if this is a deleted record.
+
+As the metadata can be in [any format supported by the repository](#fieldhandrepositorymetadata_formats), Fieldhand doesn't attempt to parse the metadata but leaves parsing to the client.
+
+### `Fieldhand::Header`
+
+A class representing the [header](https://www.openarchives.org/OAI/openarchivesprotocol.html#header) of a record:
+
+> Contains the unique identifier of the item and properties necessary for selective harvesting. The header consists of
+> the following parts:
+>
+> * the unique identifier -- the unique identifier of an item in a repository;
+> * the datestamp -- the date of creation, modification or deletion of the record for the purpose of selective
+>   harvesting.
+> * zero or more setSpec elements -- the set membership of the item for the purpose of selective harvesting.
+> * an optional status attribute with a value of deleted indicates the withdrawal of availability of the specified
+>   metadata format for the item, dependent on the repository support for deletions.
+
+#### `Fieldhand::Header#deleted?`
+
+```ruby
+repository.identifiers('oai_dc').first.deleted?
+#=> true
+```
+
+Return whether or not a record is [deleted](https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords) as a `Boolean`.
+
+#### `Fieldhand::Header#status`
+
+```ruby
+repository.identifiers('oai_dc').first.status
+#=> "deleted"
+```
+
+Return the optional `status` attribute of the header as a `String` or `nil`.
+
+> [A] value of deleted indicates the withdrawal of availability of the specified metadata format for the item, dependent on the repository support for deletions.
+
+#### `Fieldhand::Header#identifier`
+
+```ruby
+repository.identifiers('oai_dc').first.identifier
+#=> "oai:www.example.com:1"
+```
+
+Return the [unique identifier](https://www.openarchives.org/OAI/openarchivesprotocol.html#UniqueIdentifier) for this record in the repository.
+
+#### `Fieldhand::Header#datestamp`
+
+```ruby
+repository.identifiers('oai_dc').first.datestamp
+#=> 2011-03-03 16:29:24 UTC
+```
+
+Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time].
+
+#### `Fieldhand::Header#sets`
+
+```ruby
+repository.identifiers('oai_dc').first.sets
+#=> ["A", "B"]
+```
+
+Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memberships of this record.
+
+### `Fieldhand::NetworkError`
+
+An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository. Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
+
+  [Enumerator]: https://ruby-doc.org/core/Enumerator.html
+  [Time]: https://ruby-doc.org/core/Time.html
+  [URI]: https://ruby-doc.org/stdlib/libdoc/uri/rdoc/URI.html
+  [Element]: http://www.rubydoc.info/github/ohler55/ox/Ox/Element
 
 ## Acknowledgements
 
 * Example XML responses are taken from [Datacite's OAI-PMH repository](https://oai.datacite.org/).
 * Null device detection is based on the implementation from the [backports](https://github.com/marcandre/backports) gem.
+* Much of the documentation relies on wording from version 2.0 of [The Open Archives Initiative Protocol for Metadata Harvesting](https://www.openarchives.org/OAI/openarchivesprotocol.html).
 
 ## License
 

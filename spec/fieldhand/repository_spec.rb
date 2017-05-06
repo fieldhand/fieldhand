@@ -17,8 +17,8 @@ module Fieldhand
         format = repository.metadata_formats.first
 
         expect(format).to have_attributes(:prefix => 'oai_dc',
-                                          :schema => 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
-                                          :namespace => 'http://www.openarchives.org/OAI/2.0/oai_dc/')
+                                          :schema => URI('http://www.openarchives.org/OAI/2.0/oai_dc.xsd'),
+                                          :namespace => URI('http://www.openarchives.org/OAI/2.0/oai_dc/'))
       end
 
       it 'raises an error if the connection times out' do
@@ -129,7 +129,7 @@ module Fieldhand
         identify = repository.identify
 
         expect(identify).to have_attributes(:name => 'DataCite MDS',
-                                            :base_url => 'http://oai.datacite.org/oai',
+                                            :base_url => URI('http://oai.datacite.org/oai'),
                                             :protocol_version => '2.0',
                                             :earliest_datestamp => Time.xmlschema('2011-01-01T00:00:00Z'),
                                             :deleted_record => 'persistent',

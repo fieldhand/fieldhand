@@ -1,3 +1,5 @@
+require 'uri'
+
 module Fieldhand
   # A metadata format supported by the repository.
   #
@@ -14,11 +16,11 @@ module Fieldhand
     end
 
     def schema
-      @schema ||= element.schema.text
+      @schema ||= URI(element.schema.text)
     end
 
     def namespace
-      @namespace ||= element.metadataNamespace.text
+      @namespace ||= URI(element.metadataNamespace.text)
     end
   end
 end

@@ -1,4 +1,5 @@
 require 'time'
+require 'uri'
 
 module Fieldhand
   # Information about a repository.
@@ -16,7 +17,7 @@ module Fieldhand
     end
 
     def base_url
-      @base_url ||= element.baseURL.text
+      @base_url ||= URI(element.baseURL.text)
     end
 
     def protocol_version
@@ -24,7 +25,7 @@ module Fieldhand
     end
 
     def earliest_datestamp
-      @earliest_datestamp ||= Time.xmlschema(element.earliestDatestamp.text)
+      @earliest_datestamp ||= ::Time.xmlschema(element.earliestDatestamp.text)
     end
 
     def deleted_record

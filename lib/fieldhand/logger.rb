@@ -13,8 +13,8 @@ module Fieldhand
     # Determine the null device on this platform, a backport of more recent Rubies' File::NULL
     # See https://github.com/marcandre/backports/blob/v3.8.0/lib/backports/1.9.3/file/null.rb
     def null_device
-      platform = RUBY_PLATFORM
-      platform = RbConfig::CONFIG['host_os'] if platform == 'java'
+      platform = ::RUBY_PLATFORM
+      platform = ::RbConfig::CONFIG['host_os'] if platform == 'java'
 
       case platform
       when /mswin|mingw/i then 'NUL'
