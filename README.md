@@ -142,7 +142,8 @@ May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem conta
 ```ruby
 repository.records
 repository.records(:metadata_prefix => 'oai_dc', :from => '2001-01-01')
-repository.records(:set => 'A', :until => '2010-01-01')
+repository.records(:metadata_prefix => 'oai_dc', :from => Date.new(2001, 1, 1))
+repository.records(:set => 'A', :until => Time.utc(2010, 1, 1, 12, 0))
 ```
 
 Return an [`Enumerator`][Enumerator] of all [`Record`](#fieldhandrecord)s harvested from the repository.
@@ -155,7 +156,7 @@ Optional arguments can be passed as a `Hash` of `arguments` to permit selective 
 * `:set`: an optional argument with a [set spec](#fieldhandsetspec) value (passed as either a `String` or a [`Set`](#fieldhandset)), which specifies set criteria for selective harvesting;
 * `:resumption_token`: an exclusive argument with a `String` value that is the flow control token returned by a previous request that issued an incomplete list.
 
-Note that datetimes should respect the repository's [granularity](#fieldhandidentifygranularity).
+Note that datetimes should respect the repository's [granularity](#fieldhandidentifygranularity) otherwise they will return a [`BadArgumentError`](#fieldhandbadargumenterror).
 
 May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
@@ -164,7 +165,8 @@ May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem conta
 ```ruby
 repository.identifiers
 repository.identifiers(:metadata_prefix => 'oai_dc', :from => '2001-01-01')
-repository.identifiers(:set => 'A', :until => '2010-01-01')
+repository.identifiers(:metadata_prefix => 'oai_dc', :from => Date.new(2001, 1, 1))
+repository.identifiers(:set => 'A', :until => Time.utc(2010, 1, 1, 12, 0))
 ```
 
 Return an [`Enumerator`][Enumerator] for an abbreviated form of [records](#fieldhandrepositoryrecordsarguments), retrieving only [`Header`](#fieldhandheader)s with the given optional `arguments`.

@@ -13,10 +13,16 @@ module Fieldhand
     end
 
     def self.unparse(datestamp)
-      return datestamp if datestamp.is_a?(::String)
-      return datestamp.xmlschema if datestamp.respond_to?(:xmlschema)
-
-      datestamp.strftime
+      case datestamp
+      when ::String
+        datestamp
+      when ::Date
+        datestamp.strftime
+      when ::Time
+        datestamp.utc.xmlschema
+      else
+        datestamp.xmlschema
+      end
     end
   end
 end

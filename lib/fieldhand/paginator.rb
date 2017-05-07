@@ -21,6 +21,17 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
+    ERROR_CODES = {
+      'badArgument' => BadArgumentError,
+      'badResumptionToken' => BadResumptionTokenError,
+      'badVerb' => BadVerbError,
+      'cannotDisseminateFormat' => CannotDisseminateFormatError,
+      'idDoesNotExist' => IdDoesNotExistError,
+      'noRecordsMatch' => NoRecordsMatchError,
+      'noMetadataFormats' => NoMetadataFormatsError,
+      'noSetHierarchy' => NoSetHierarchyError
+    }.freeze
+
     attr_reader :uri, :logger, :http
 
     def initialize(uri, logger = Logger.null)
@@ -30,7 +41,7 @@ module Fieldhand
       @http.use_ssl = true if @uri.scheme == 'https'
     end
 
-    def items(verb, path, query = {})
+    def items(verb, path, query = {}) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       return enum_for(:items, verb, path, query) unless block_given?
 
       loop do
@@ -67,16 +78,9 @@ module Fieldhand
     end
 
     def convert_error(error)
-      case error['code']
-      when 'badArgument' then raise BadArgumentError, error.text
-      when 'badResumptionToken' then raise BadResumptionTokenError, error.text
-      when 'badVerb' then raise BadVerbError, error.text
-      when 'cannotDisseminateFormat' then raise CannotDisseminateFormatError, error.text
-      when 'idDoesNotExist' then raise IdDoesNotExistError, error.text
-      when 'noRecordsMatch' then raise NoRecordsMatchError, error.text
-      when 'noMetadataFormats' then raise NoMetadataFormatsError, error.text
-      when 'noSetHierarchy' then raise NoSetHierarchyError, error.text
-      end
+      return unless ERROR_CODES.key?(error['code'])
+
+      raise ERROR_CODES.fetch(error['code']), error.text
     end
 
     def encode_query(query = {})
