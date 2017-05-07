@@ -6,7 +6,7 @@ module Fieldhand
   class Datestamp
     def self.parse(datestamp)
       if datestamp.size == 10
-        ::Date.xmlschema(datestamp)
+        ::Date.strptime(datestamp)
       else
         ::Time.xmlschema(datestamp)
       end
@@ -14,8 +14,9 @@ module Fieldhand
 
     def self.unparse(datestamp)
       return datestamp if datestamp.is_a?(::String)
+      return datestamp.xmlschema if datestamp.respond_to?(:xmlschema)
 
-      datestamp.xmlschema
+      datestamp.strftime
     end
   end
 end
