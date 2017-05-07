@@ -367,7 +367,7 @@ Return the optional `status` attribute of the [record's header](https://www.open
 #### `Fieldhand::Record#identifier`
 
 ```ruby
-repository.records('oai_dc').first.identifier
+repository.records.first.identifier
 #=> "oai:www.example.com:1"
 ```
 
