@@ -33,7 +33,7 @@ repository.get('oai:www.example.com:12345', 'oai_dc')
 * [`Fieldhand::Repository`](#fieldhandrepository)
   * [`.new(uri[, logger])`](#fieldhandrepositorynewuri-logger)
   * [`#identify`](#fieldhandrepositoryidentify)
-  * [`#metadata_formats`](#fieldhandrepositorymetadata_formats)
+  * [`#metadata_formats([identifier])`](#fieldhandrepositorymetadata_formatsidentifier)
   * [`#sets`](#fieldhandrepositorysets)
   * [`#records(metadata_prefix[, arguments])`](#fieldhandrepositoryrecordsmetadata_prefix-arguments)
   * [`#identifiers(metadata_prefix[, arguments])`](#fieldhandrepositoryidentifiersmetadata_prefix-arguments)
@@ -103,14 +103,15 @@ Return an [`Identify`](#fieldhandidentify) for the repository including informat
 
 May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
 
-#### `Fieldhand::Repository#metadata_formats`
+#### `Fieldhand::Repository#metadata_formats([identifier])`
 
 ```ruby
 repository.metadata_formats
 #=> #<Enumerator: ...>
+repository.metadata_formats('oai:www.example.com:1')
 ```
 
-Return an [`Enumerator`][Enumerator] of [`MetadataFormat`](#fieldhandmetadataformat)s available from the repository.
+Return an [`Enumerator`][Enumerator] of [`MetadataFormat`](#fieldhandmetadataformat)s available from the repository. Optionally takes an `identifier` that specifies the unique identifier of the item for which available metadata formats are being requested.
 
 May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
 
@@ -368,7 +369,7 @@ repository.records('oai_dc').first.metadata
 
 Return a single manifestation of the metadata from a record as [`Ox::Element`][Element]s or `nil` if this is a deleted record.
 
-As the metadata can be in [any format supported by the repository](#fieldhandrepositorymetadata_formats), Fieldhand doesn't attempt to parse the metadata but leaves parsing to the client.
+As the metadata can be in [any format supported by the repository](#fieldhandrepositorymetadata_formatsidentifier), Fieldhand doesn't attempt to parse the metadata but leaves parsing to the client.
 
 ### `Fieldhand::Header`
 

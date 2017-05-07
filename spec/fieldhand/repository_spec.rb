@@ -44,6 +44,14 @@ module Fieldhand
 
         expect { repository.metadata_formats.to_a }.to raise_error(NetworkError)
       end
+
+      it 'supports an optional identifier argument' do
+        stub_oai_request('http://www.example.com/oai?verb=ListMetadataFormats&identifier=foobar',
+                         'list_metadata_formats.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        repository.metadata_formats('foobar').to_a
+      end
     end
 
     describe '#sets' do

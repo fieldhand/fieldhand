@@ -26,11 +26,14 @@ module Fieldhand
         first
     end
 
-    def metadata_formats
-      return enum_for(:metadata_formats) unless block_given?
+    def metadata_formats(identifier = nil)
+      return enum_for(:metadata_formats, identifier) unless block_given?
+
+      arguments = {}
+      arguments['identifier'] = identifier if identifier
 
       paginator.
-        items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat').
+        items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat', arguments).
         each do |format|
           yield MetadataFormat.new(format)
         end
