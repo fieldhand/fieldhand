@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-07T15:00:11Z</responseDate>
+  <request verb="GetRecord" identifier="bad" metadataPrefix="oai_dc">http://oai.datacite.org/oai</request>
+  <error code="idDoesNotExist">"bad" is unknown or illegal in this repository</error>
+</OAI-PMH>

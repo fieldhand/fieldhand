@@ -6,6 +6,15 @@ require 'fieldhand/logger'
 
 module Fieldhand
   NetworkError = ::Class.new(::StandardError)
+  ProtocolError = ::Class.new(::StandardError)
+  BadArgumentError = ::Class.new(ProtocolError)
+  BadResumptionTokenError = ::Class.new(ProtocolError)
+  BadVerbError = ::Class.new(ProtocolError)
+  CannotDisseminateFormatError = ::Class.new(ProtocolError)
+  IdDoesNotExistError = ::Class.new(ProtocolError)
+  NoRecordsMatchError = ::Class.new(ProtocolError)
+  NoMetadataFormatsError = ::Class.new(ProtocolError)
+  NoSetHierarchyError = ::Class.new(ProtocolError)
 
   # An abstraction over interactions with an OAI-PMH repository, handling requests, responses and paginating over
   # results using a resumption token.
@@ -17,8 +26,8 @@ module Fieldhand
     def initialize(uri, logger = Logger.null)
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
       @logger = logger
-      @http = ::Net::HTTP.new(uri.host, uri.port)
-      @http.use_ssl = true if uri.scheme == 'https'
+      @http = ::Net::HTTP.new(@uri.host, @uri.port)
+      @http.use_ssl = true if @uri.scheme == 'https'
     end
 
     def items(verb, path, query = {})
@@ -26,6 +35,11 @@ module Fieldhand
 
       loop do
         document = ::Ox.parse(request(query.merge('verb' => verb)))
+
+        document.root.locate('error').each do |error|
+          convert_error(error)
+        end
+
         document.root.locate(path).each do |item|
           yield item
         end
@@ -50,6 +64,19 @@ module Fieldhand
       raise NetworkError, "timeout requesting #{query}: #{e}"
     rescue => e
       raise NetworkError, "error requesting #{query}: #{e}"
+    end
+
+    def convert_error(error)
+      case error['code']
+      when 'badArgument' then raise BadArgumentError, error.text
+      when 'badResumptionToken' then raise BadResumptionTokenError, error.text
+      when 'badVerb' then raise BadVerbError, error.text
+      when 'cannotDisseminateFormat' then raise CannotDisseminateFormatError, error.text
+      when 'idDoesNotExist' then raise IdDoesNotExistError, error.text
+      when 'noRecordsMatch' then raise NoRecordsMatchError, error.text
+      when 'noMetadataFormats' then raise NoMetadataFormatsError, error.text
+      when 'noSetHierarchy' then raise NoSetHierarchyError, error.text
+      end
     end
 
     def encode_query(query = {})

@@ -71,6 +71,15 @@ repository.get('oai:www.example.com:12345')
   * [`#datestamp`](#fieldhandheaderdatestamp)
   * [`#sets`](#fieldhandheadersets)
 * [`Fieldhand::NetworkError`](#fieldhandnetworkerror)
+* [`Fieldhand::ProtocolError`](#fieldhandprotocolerror)
+  * [`Fieldhand::BadArgumentError`](#fieldhandbadargumenterror)
+  * [`Fieldhand::BadResumptionTokenError`](#fieldhandbadresumptiontokenerror)
+  * [`Fieldhand::BadVerbError`](#fieldhandbadverberror)
+  * [`Fieldhand::CannotDisseminateFormatError`](#fieldhandcannotdisseminateformaterror)
+  * [`Fieldhand::IdDoesNotExistError`](#fieldhandiddoesnotexisterror)
+  * [`Fieldhand::NoRecordsMatchError`](#fieldhandnorecordsmatcherror)
+  * [`Fieldhand::NoMetadataFormatsError`](#fieldhandnometadataformatserror)
+  * [`Fieldhand::NoSetHierarchyError`](#fieldhandnosethierarchyerror)
 
 ### `Fieldhand::Repository`
 
@@ -103,7 +112,7 @@ repository.identify
 
 Return an [`Identify`](#fieldhandidentify) for the repository including information such as the repository name, base URL, protocol version, etc.
 
-May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
 #### `Fieldhand::Repository#metadata_formats([identifier])`
 
@@ -115,7 +124,7 @@ repository.metadata_formats('oai:www.example.com:1')
 
 Return an [`Enumerator`][Enumerator] of [`MetadataFormat`](#fieldhandmetadataformat)s available from the repository. Optionally takes an `identifier` that specifies the unique identifier of the item for which available metadata formats are being requested.
 
-May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
 #### `Fieldhand::Repository#sets`
 
@@ -126,7 +135,7 @@ repository.sets
 
 Return an [`Enumerator`][Enumerator] of [`Set`](#fieldhandset)s that represent the set structure of a repository.
 
-May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
 #### `Fieldhand::Repository#records([arguments])`
 
@@ -148,7 +157,7 @@ Optional arguments can be passed as a `Hash` of `arguments` to permit selective 
 
 Note that datetimes should respect the repository's [granularity](#fieldhandidentifygranularity).
 
-May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
 #### `Fieldhand::Repository#identifiers(metadata_prefix[, arguments])`
 
@@ -162,6 +171,8 @@ Return an [`Enumerator`][Enumerator] for an abbreviated form of [records](#field
 
 See [`Fieldhand::Repository#records`](#fieldhandrepositoryrecordsarguments) for supported `arguments`.
 
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
+
 #### `Fieldhand::Repository#get(identifier[, arguments])`
 
 ```ruby
@@ -171,6 +182,8 @@ repository.get('oai:www.example.com:1', :metadata_prefix => 'oai_dc')
 ```
 
 Return an individual metadata [`Record`](#fieldhandrecord) from a repository with the given `identifier` and optional `:metadata_prefix` argument (defaults to `oai_dc`).
+
+May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository or any descendant [`ProtocolError`](#fieldhandprotocolerror) if received in response.
 
 ### `Fieldhand::Identify`
 
@@ -458,6 +471,49 @@ Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memb
 ### `Fieldhand::NetworkError`
 
 An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository. Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
+
+### `Fieldhand::ProtocolError`
+
+The parent error class (descended from `StandardError`) for any errors returned by a repository as defined in the [protocol's Error and Exception Conditions](https://www.openarchives.org/OAI/openarchivesprotocol.html#ErrorConditions).
+
+This can be used to rescue all the following child error types.
+
+### `Fieldhand::BadArgumentError`
+
+> The request includes illegal arguments, is missing required arguments,
+> includes a repeated argument, or values for arguments have an illegal syntax.
+
+### `Fieldhand::BadResumptionTokenError`
+
+> The value of the `resumptionToken` argument is invalid or expired.
+
+### `Fieldhand::BadVerbError`
+
+> Value of the `verb` argument is not a legal OAI-PMH verb, the `verb` argument is
+> missing, or the `verb` argument is repeated.
+
+### `Fieldhand::CannotDisseminateFormatError`
+
+> The metadata format identified by the value given for the `metadataPrefix`
+> argument is not supported by the item or by the repository.
+
+### `Fieldhand::IdDoesNotExistError`
+
+> The value of the `identifier` argument is unknown or illegal in this
+> repository.
+
+### `Fieldhand::NoRecordsMatchError`
+
+> The combination of the values of the `from`, `until`, `set` and `metadataPrefix`
+> arguments results in an empty list.
+
+### `Fieldhand::NoMetadataFormatsError`
+
+> There are no metadata formats available for the specified item.
+
+### `Fieldhand::NoSetHierarchyError`
+
+> The repository does not support sets.
 
   [Date]: https://ruby-doc.org/stdlib/libdoc/date/rdoc/Date.html
   [Enumerator]: https://ruby-doc.org/core/Enumerator.html

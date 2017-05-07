@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-05-07T15:03:30Z</responseDate>
+  <request verb="ListRecords" metadataPrefix="oai_dc" from="2999-01-01">http://oai.datacite.org/oai</request>
+  <error code="noRecordsMatch">The combination of the values of the from, until, set, and metadataPrefix arguments results in an empty list.</error>
+</OAI-PMH>
