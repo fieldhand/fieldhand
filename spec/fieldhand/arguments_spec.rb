@@ -1,5 +1,6 @@
 require 'fieldhand/arguments'
 require 'fieldhand/set'
+require 'fieldhand/metadata_format'
 require 'ox'
 require 'date'
 require 'time'
@@ -15,6 +16,14 @@ module Fieldhand
 
       it 'allows overriding the metadata prefix' do
         arguments = described_class.new(:metadata_prefix => 'xoai')
+
+        expect(arguments.to_query).to eq('metadataPrefix' => 'xoai')
+      end
+
+      it 'allows overriding the metadata prefix with a Metadata Format' do
+        element = Ox.parse('<metadataFormat><metadataPrefix>xoai</metadataPrefix></metadataFormat>')
+        format = MetadataFormat.new(element)
+        arguments = described_class.new(:metadata_prefix => format)
 
         expect(arguments.to_query).to eq('metadataPrefix' => 'xoai')
       end

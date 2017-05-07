@@ -140,7 +140,7 @@ Return an [`Enumerator`][Enumerator] of all [`Record`](#fieldhandrecord)s harves
 
 Optional arguments can be passed as a `Hash` of `arguments` to permit selective harvesting of records based on set membership and/or datestamp:
 
-* `:metadata_prefix`: a string to specify the metadata format that should be included in the metadata part of the returned record, defaults to `oai_dc`;
+* `:metadata_prefix`: a `String` or [`MetadataFormat`](#fieldhandmetadataformat) to specify the metadata format that should be included in the metadata part of the returned record, defaults to `oai_dc`;
 * `:from`: an optional argument with a `String`, [`Date`][Date] or [`Time`][Time] [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a lower bound for datestamp-based selective harvesting;
 * `:until`: an optional argument with a `String`, [`Date`][Date] or [`Time`][Time] [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a upper bound for datestamp-based selective harvesting;
 * `:set`: an optional argument with a [set spec](#fieldhandsetspec) value (passed as either a `String` or a [`Set`](#fieldhandset)), which specifies set criteria for selective harvesting;

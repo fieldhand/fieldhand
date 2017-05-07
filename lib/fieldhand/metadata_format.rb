@@ -11,6 +11,10 @@ module Fieldhand
       @element = element
     end
 
+    def to_s
+      prefix
+    end
+
     def prefix
       @prefix ||= element.metadataPrefix.text
     end
