@@ -1,8 +1,8 @@
+require 'fieldhand/logger'
+require 'ox'
 require 'cgi'
 require 'net/http'
 require 'uri'
-require 'ox'
-require 'fieldhand/logger'
 
 module Fieldhand
   NetworkError = ::Class.new(::StandardError)

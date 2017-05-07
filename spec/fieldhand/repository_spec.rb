@@ -103,7 +103,7 @@ module Fieldhand
         record = repository.records.first
 
         expect(record).to have_attributes(:identifier => 'oai:oai.datacite.org:32355',
-                                          :datestamp => Time.xmlschema('2011-07-07T11:19:03Z'),
+                                          :datestamp => ::Time.xmlschema('2011-07-07T11:19:03Z'),
                                           :sets => %w[TIB TIB.DAGST])
       end
 
@@ -113,7 +113,7 @@ module Fieldhand
         record = repository.records.first
 
         expect(record).to have_attributes(:status => 'deleted',
-                                          :datestamp => Time.xmlschema('2011-03-04T14:18:47Z'),
+                                          :datestamp => ::Time.xmlschema('2011-03-04T14:18:47Z'),
                                           :sets => %w[BL BL.WAP])
       end
 
@@ -154,7 +154,7 @@ module Fieldhand
         expect(identify).to have_attributes(:name => 'DataCite MDS',
                                             :base_url => URI('http://oai.datacite.org/oai'),
                                             :protocol_version => '2.0',
-                                            :earliest_datestamp => Time.xmlschema('2011-01-01T00:00:00Z'),
+                                            :earliest_datestamp => ::Time.xmlschema('2011-01-01T00:00:00Z'),
                                             :deleted_record => 'persistent',
                                             :granularity => 'YYYY-MM-DDThh:mm:ssZ',
                                             :admin_emails => %w[admin@datacite.org],
