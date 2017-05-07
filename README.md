@@ -55,6 +55,7 @@ repository.get('oai:www.example.com:12345', 'oai_dc')
 * [`Fieldhand::Set`](#fieldhandset)
   * [`#spec`](#fieldhandsetspec)
   * [`#name`](#fieldhandsetname)
+  * [`#descriptions`](#fieldhandsetdescriptions)
 * [`Fieldhand::Record`](#fieldhandrecord)
   * [`#deleted?`](#fieldhandrecorddeleted)
   * [`#status`](#fieldhandrecordstatus)
@@ -307,6 +308,15 @@ repository.sets.first.name
 ```
 
 Return a short human-readable `String` naming the set.
+
+#### `Fieldhand::Set#descriptions`
+
+```ruby
+repository.sets.first.descriptions
+#=> [#<Ox::Element: ...>]
+```
+
+Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers that may hold community-specific XML-encoded data about the set.
 
 ### `Fieldhand::Record`
 

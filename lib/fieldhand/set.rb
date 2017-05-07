@@ -16,5 +16,9 @@ module Fieldhand
     def name
       @name ||= element.setName.text
     end
+
+    def descriptions
+      @descriptions ||= element.locate('setDescription')
+    end
   end
 end
