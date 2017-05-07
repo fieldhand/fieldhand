@@ -9,6 +9,10 @@ module Fieldhand
       @element = element
     end
 
+    def to_s
+      spec
+    end
+
     def spec
       @spec ||= element.setSpec.text
     end

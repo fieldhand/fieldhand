@@ -1,3 +1,4 @@
+require 'fieldhand/arguments'
 require 'fieldhand/header'
 require 'fieldhand/identify'
 require 'fieldhand/logger'
@@ -49,29 +50,38 @@ module Fieldhand
         end
     end
 
-    def records(metadata_prefix, arguments = {})
-      return enum_for(:records, metadata_prefix, arguments) unless block_given?
+    def records(arguments = {})
+      return enum_for(:records, arguments) unless block_given?
+
+      query = Arguments.new(arguments).to_query
 
       paginator.
-        items('ListRecords', 'ListRecords/record', arguments.merge('metadataPrefix' => metadata_prefix)).
+        items('ListRecords', 'ListRecords/record', query).
         each do |record|
           yield Record.new(record)
         end
     end
 
-    def identifiers(metadata_prefix, arguments = {})
-      return enum_for(:identifiers, metadata_prefix, arguments) unless block_given?
+    def identifiers(arguments = {})
+      return enum_for(:identifiers, arguments) unless block_given?
+
+      query = Arguments.new(arguments).to_query
 
       paginator.
-        items('ListIdentifiers', 'ListIdentifiers/header', arguments.merge('metadataPrefix' => metadata_prefix)).
+        items('ListIdentifiers', 'ListIdentifiers/header', query).
         each do |header|
           yield Header.new(header)
         end
     end
 
-    def get(identifier, metadata_prefix)
+    def get(identifier, arguments = {})
+      query = {
+        'identifier' => identifier,
+        'metadataPrefix' => arguments.fetch(:metadata_prefix, 'oai_dc')
+      }
+
       paginator.
-        items('GetRecord', 'GetRecord/record', 'metadataPrefix' => metadata_prefix, 'identifier' => identifier).
+        items('GetRecord', 'GetRecord/record', query).
         map { |record| Record.new(record) }.
         first
     end

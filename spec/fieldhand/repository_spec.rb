@@ -81,11 +81,18 @@ module Fieldhand
     end
 
     describe '#records' do
+      it 'defaults to using a metadata prefix of oai_dc' do
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc', 'list_records_1.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        repository.records.first
+      end
+
       it 'returns all records for this repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc', 'list_records_1.xml')
         stub_oai_request('http://www.example.com/oai?verb=ListRecords&resumptionToken=foobar', 'list_records_2.xml')
         repository = described_class.new('http://www.example.com/oai')
-        records = repository.records('oai_dc').to_a
+        records = repository.records(:metadata_prefix => 'oai_dc').to_a
 
         expect(records.size).to eq(4)
       end
@@ -93,7 +100,7 @@ module Fieldhand
       it 'populates records with the right information' do
         stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc', 'list_records_1.xml')
         repository = described_class.new('http://www.example.com/oai')
-        record = repository.records('oai_dc').first
+        record = repository.records.first
 
         expect(record).to have_attributes(:identifier => 'oai:oai.datacite.org:32355',
                                           :datestamp => Time.xmlschema('2011-07-07T11:19:03Z'),
@@ -103,7 +110,7 @@ module Fieldhand
       it 'populates deleted records with the right information' do
         stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=oai_dc', 'list_records_2.xml')
         repository = described_class.new('http://www.example.com/oai')
-        record = repository.records('oai_dc').first
+        record = repository.records.first
 
         expect(record).to have_attributes(:status => 'deleted',
                                           :datestamp => Time.xmlschema('2011-03-04T14:18:47Z'),
@@ -115,16 +122,24 @@ module Fieldhand
                          'list_records_2.xml')
         repository = described_class.new('http://www.example.com/oai')
 
-        repository.records('oai_dc', 'from' => '2001-01-01', 'until' => '2002-01-01')
+        repository.records(:from => '2001-01-01', :until => '2002-01-01')
       end
     end
 
     describe '#identifiers' do
+      it 'defaults to a metadata prefix of "oai_dc"' do
+        stub_oai_request('http://www.example.com/oai?verb=ListIdentifiers&metadataPrefix=oai_dc',
+                         'list_identifiers.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        repository.identifiers.first
+      end
+
       it 'returns all headers from the repository' do
         stub_oai_request('http://www.example.com/oai?verb=ListIdentifiers&metadataPrefix=oai_dc',
                          'list_identifiers.xml')
         repository = described_class.new('http://www.example.com/oai')
-        headers = repository.identifiers('oai_dc').to_a
+        headers = repository.identifiers(:metadata_prefix => 'oai_dc').to_a
 
         expect(headers.size).to eq(2)
       end
@@ -155,12 +170,20 @@ module Fieldhand
     end
 
     describe '#get' do
+      it 'defaults to a metadata prefix of "oai_dc"' do
+        stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356',
+                         'get_record.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        repository.get('oai:oai.datacite.org:32356')
+      end
+
       it 'fetches the record by identifier' do
         stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:oai.datacite.org:32356',
                          'get_record.xml')
         repository = described_class.new('http://www.example.com/oai')
 
-        expect(repository.get('oai:oai.datacite.org:32356', 'oai_dc')).
+        expect(repository.get('oai:oai.datacite.org:32356', :metadata_prefix => 'oai_dc')).
           to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
       end
     end

@@ -20,11 +20,11 @@ repository.metadata_formats.map { |format| format.prefix }
 repository.sets.map { |set| set.name }
 #=> ["Set A.", "Set B."]
 
-repository.records('oai_dc').each do |record|
+repository.records.each do |record|
   # ...
 end
 
-repository.get('oai:www.example.com:12345', 'oai_dc')
+repository.get('oai:www.example.com:12345')
 #=> #<Fieldhand::Record: ...>
 ```
 
@@ -35,9 +35,9 @@ repository.get('oai:www.example.com:12345', 'oai_dc')
   * [`#identify`](#fieldhandrepositoryidentify)
   * [`#metadata_formats([identifier])`](#fieldhandrepositorymetadata_formatsidentifier)
   * [`#sets`](#fieldhandrepositorysets)
-  * [`#records(metadata_prefix[, arguments])`](#fieldhandrepositoryrecordsmetadata_prefix-arguments)
-  * [`#identifiers(metadata_prefix[, arguments])`](#fieldhandrepositoryidentifiersmetadata_prefix-arguments)
-  * [`#get(identifier, metadata_prefix)`](#fieldhandgetidentifier-metadata_prefix)
+  * [`#records([arguments])`](#fieldhandrepositoryrecordsarguments)
+  * [`#identifiers([arguments])`](#fieldhandrepositoryidentifiersarguments)
+  * [`#get(identifier[, arguments])`](#fieldhandgetidentifier-arguments)
 * [`Fieldhand::Identify`](#fieldhandidentify)
   * [`#name`](#fieldhandidentifyname)
   * [`#base_url`](#fieldhandidentifybase_url)
@@ -128,21 +128,23 @@ Return an [`Enumerator`][Enumerator] of [`Set`](#fieldhandset)s that represent t
 
 May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem contacting the repository.
 
-#### `Fieldhand::Repository#records(metadata_prefix[, arguments])`
+#### `Fieldhand::Repository#records([arguments])`
 
 ```ruby
-repository.records('oai_dc')
-repository.records('oai_dc', 'from' => '2001-01-01')
-repository.records('oai_dc', 'set' => 'A', 'until' => '2010-01-01')
+repository.records
+repository.records(:metadata_prefix => 'oai_dc', :from => '2001-01-01')
+repository.records(:set => 'A', :until => '2010-01-01')
 ```
 
-Return an [`Enumerator`][Enumerator] of all [`Record`](#fieldhandrecord)s with the given `metadata_prefix` harvested from the repository.
+Return an [`Enumerator`][Enumerator] of all [`Record`](#fieldhandrecord)s harvested from the repository.
 
 Optional arguments can be passed as a `Hash` of `arguments` to permit selective harvesting of records based on set membership and/or datestamp:
 
-* `from`: an optional argument with a `String` [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a lower bound for datestamp-based selective harvesting;
-* `until`: an optional argument with a `String` [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a upper bound for datestamp-based selective harvesting;
-* `set`: an optional argument with a [set spec](#fieldhandsetspec) value, which specifies set criteria for selective harvesting.
+* `:metadata_prefix`: a string to specify the metadata format that should be included in the metadata part of the returned record, defaults to `oai_dc`;
+* `:from`: an optional argument with a `String`, [`Date`][Date] or [`Time`][Time] [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a lower bound for datestamp-based selective harvesting;
+* `:until`: an optional argument with a `String`, [`Date`][Date] or [`Time`][Time] [UTCdatetime](https://www.openarchives.org/OAI/openarchivesprotocol.html#Dates) value, which specifies a upper bound for datestamp-based selective harvesting;
+* `:set`: an optional argument with a [set spec](#fieldhandsetspec) value (passed as either a `String` or a [`Set`](#fieldhandset)), which specifies set criteria for selective harvesting;
+* `:resumption_token`: an exclusive argument with a `String` value that is the flow control token returned by a previous request that issued an incomplete list.
 
 Note that datetimes should respect the repository's [granularity](#fieldhandidentifygranularity).
 
@@ -151,23 +153,24 @@ May raise a [`NetworkError`](#fieldhandnetworkerror) if there is a problem conta
 #### `Fieldhand::Repository#identifiers(metadata_prefix[, arguments])`
 
 ```ruby
-repository.identifiers('oai_dc')
-repository.identifiers('oai_dc', 'from' => '2001-01-01')
-repository.identifiers('oai_dc', 'set' => 'A', 'until' => '2010-01-01')
+repository.identifiers
+repository.identifiers(:metadata_prefix => 'oai_dc', :from => '2001-01-01')
+repository.identifiers(:set => 'A', :until => '2010-01-01')
 ```
 
-Return an [`Enumerator`][Enumerator] for an abbreviated form of [records](#fieldhandrepositoryrecordsmetadata_prefix-arguments), retrieving only [`Header`](#fieldhandheader)s for the given `metadata_prefix` and optional `arguments`.
+Return an [`Enumerator`][Enumerator] for an abbreviated form of [records](#fieldhandrepositoryrecordsarguments), retrieving only [`Header`](#fieldhandheader)s with the given optional `arguments`.
 
-See [`Fieldhand::Repository#records`](#fieldhandrepositoryrecordsmetadata_prefix-arguments) for supported `arguments`.
+See [`Fieldhand::Repository#records`](#fieldhandrepositoryrecordsarguments) for supported `arguments`.
 
-#### `Fieldhand::Repository#get(identifier, metadata_prefix)`
+#### `Fieldhand::Repository#get(identifier[, arguments])`
 
 ```ruby
-repository.get('oai:www.example.com:1', 'oai_dc')
+repository.get('oai:www.example.com:1')
+repository.get('oai:www.example.com:1', :metadata_prefix => 'oai_dc')
 #=> #<Fieldhand::Record: ...>
 ```
 
-Return an individual metadata [`Record`](#fieldhandrecord) from a repository with the given `identifier` and `metadata_prefix`.
+Return an individual metadata [`Record`](#fieldhandrecord) from a repository with the given `identifier` and optional `:metadata_prefix` argument (defaults to `oai_dc`).
 
 ### `Fieldhand::Identify`
 
@@ -327,7 +330,7 @@ A class representing a [record](https://www.openarchives.org/OAI/openarchivespro
 #### `Fieldhand::Record#deleted?`
 
 ```ruby
-repository.records('oai_dc').first.deleted?
+repository.records.first.deleted?
 #=> true
 ```
 
@@ -336,7 +339,7 @@ Return whether or not a record is [deleted](https://www.openarchives.org/OAI/ope
 #### `Fieldhand::Record#status`
 
 ```ruby
-repository.records('oai_dc').first.status
+repository.records.first.status
 #=> "deleted"
 ```
 
@@ -356,7 +359,7 @@ Return the [unique identifier](https://www.openarchives.org/OAI/openarchivesprot
 #### `Fieldhand::Record#datestamp`
 
 ```ruby
-repository.records('oai_dc').first.datestamp
+repository.records.first.datestamp
 #=> 2011-03-03 16:29:24 UTC
 ```
 
@@ -365,7 +368,7 @@ Return the date of creation, modification or deletion of the record for the purp
 #### `Fieldhand::Record#sets`
 
 ```ruby
-repository.records('oai_dc').first.sets
+repository.records.first.sets
 #=> ["A", "B"]
 ```
 
@@ -374,7 +377,7 @@ Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memb
 #### `Fieldhand::Record#metadata`
 
 ```ruby
-repository.records('oai_dc').first.metadata
+repository.records.first.metadata
 #=> #<Ox::Element: ...>
 ```
 
@@ -385,7 +388,7 @@ As the metadata can be in [any format supported by the repository](#fieldhandrep
 #### `Fieldhand::Record#about`
 
 ```ruby
-repository.records('oai_dc').first.about
+repository.records.first.about
 #=> [#<Ox::Element: ...>]
 ```
 
@@ -408,7 +411,7 @@ A class representing the [header](https://www.openarchives.org/OAI/openarchivesp
 #### `Fieldhand::Header#deleted?`
 
 ```ruby
-repository.identifiers('oai_dc').first.deleted?
+repository.identifiers.first.deleted?
 #=> true
 ```
 
@@ -417,7 +420,7 @@ Return whether or not a record is [deleted](https://www.openarchives.org/OAI/ope
 #### `Fieldhand::Header#status`
 
 ```ruby
-repository.identifiers('oai_dc').first.status
+repository.identifiers.first.status
 #=> "deleted"
 ```
 
@@ -428,7 +431,7 @@ Return the optional `status` attribute of the header as a `String` or `nil`.
 #### `Fieldhand::Header#identifier`
 
 ```ruby
-repository.identifiers('oai_dc').first.identifier
+repository.identifiers.first.identifier
 #=> "oai:www.example.com:1"
 ```
 
@@ -437,7 +440,7 @@ Return the [unique identifier](https://www.openarchives.org/OAI/openarchivesprot
 #### `Fieldhand::Header#datestamp`
 
 ```ruby
-repository.identifiers('oai_dc').first.datestamp
+repository.identifiers.first.datestamp
 #=> 2011-03-03 16:29:24 UTC
 ```
 
@@ -446,7 +449,7 @@ Return the date of creation, modification or deletion of the record for the purp
 #### `Fieldhand::Header#sets`
 
 ```ruby
-repository.identifiers('oai_dc').first.sets
+repository.identifiers.first.sets
 #=> ["A", "B"]
 ```
 
@@ -456,6 +459,7 @@ Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memb
 
 An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository. Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
 
+  [Date]: https://ruby-doc.org/stdlib/libdoc/date/rdoc/Date.html
   [Enumerator]: https://ruby-doc.org/core/Enumerator.html
   [Time]: https://ruby-doc.org/core/Time.html
   [URI]: https://ruby-doc.org/stdlib/libdoc/uri/rdoc/URI.html
