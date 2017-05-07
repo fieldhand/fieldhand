@@ -40,8 +40,8 @@ module Fieldhand
       @admin_emails ||= element.locate('adminEmail/^String')
     end
 
-    def compression_encodings
-      @compression_encodings ||= element.locate('compression/^String')
+    def compression
+      @compression ||= element.locate('compression/^String')
     end
 
     def descriptions

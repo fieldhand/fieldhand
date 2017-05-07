@@ -143,7 +143,7 @@ module Fieldhand
                                             :deleted_record => 'persistent',
                                             :granularity => 'YYYY-MM-DDThh:mm:ssZ',
                                             :admin_emails => %w[admin@datacite.org],
-                                            :compression_encodings => %w[gzip deflate])
+                                            :compression => %w[gzip deflate])
       end
 
       it 'supports HTTPS repositories' do

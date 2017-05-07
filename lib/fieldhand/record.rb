@@ -35,6 +35,10 @@ module Fieldhand
       @metadata ||= element.locate('metadata[0]').first
     end
 
+    def about
+      @about ||= element.locate('about')
+    end
+
     def header
       @header ||= Header.new(element.header)
     end

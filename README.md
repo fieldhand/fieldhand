@@ -46,7 +46,7 @@ repository.get('oai:www.example.com:12345', 'oai_dc')
   * [`#deleted_record`](#fieldhandidentifydeleted_record)
   * [`#granularity`](#fieldhandidentifygranularity)
   * [`#admin_emails`](#fieldhandidentifyadmin_emails)
-  * [`#compression_encodings`](#fieldhandidentifycompression_encodings)
+  * [`#compression`](#fieldhandidentifycompression)
   * [`#descriptions`](#fieldhandidentifydescriptions)
 * [`Fieldhand::MetadataFormat`](#fieldhandmetadataformat)
   * [`#prefix`](#fieldhandmetadataformatprefix)
@@ -62,6 +62,7 @@ repository.get('oai:www.example.com:12345', 'oai_dc')
   * [`#datestamp`](#fieldhandrecorddatestamp)
   * [`#sets`](#fieldhandrecordsets)
   * [`#metadata`](#fieldhandrecordmetadata)
+  * [`#about`](#fieldhandrecordabout)
 * [`Fieldhand::Header`](#fieldhandheader)
   * [`#deleted?`](#fieldhandheaderdeleted)
   * [`#status`](#fieldhandheaderstatus)
@@ -234,10 +235,10 @@ repository.identify.admin_emails
 
 Returns the e-mail addresses of administrators of the repository as an `Array` of `String`s.
 
-#### `Fieldhand::Identify#compression_encodings`
+#### `Fieldhand::Identify#compression`
 
 ```ruby
-repository.identify.compression_encodings
+repository.identify.compression
 #=> ["gzip", "deflate"]
 ```
 
@@ -370,6 +371,15 @@ repository.records('oai_dc').first.metadata
 Return a single manifestation of the metadata from a record as [`Ox::Element`][Element]s or `nil` if this is a deleted record.
 
 As the metadata can be in [any format supported by the repository](#fieldhandrepositorymetadata_formatsidentifier), Fieldhand doesn't attempt to parse the metadata but leaves parsing to the client.
+
+#### `Fieldhand::Record#about`
+
+```ruby
+repository.records('oai_dc').first.about
+#=> [#<Ox::Element: ...>]
+```
+
+Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers holding data about the metadata part of the record.
 
 ### `Fieldhand::Header`
 
