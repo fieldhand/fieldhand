@@ -1,4 +1,4 @@
-require 'time'
+require 'fieldhand/datestamp'
 require 'uri'
 
 module Fieldhand
@@ -25,7 +25,7 @@ module Fieldhand
     end
 
     def earliest_datestamp
-      @earliest_datestamp ||= ::Time.xmlschema(element.earliestDatestamp.text)
+      @earliest_datestamp ||= Datestamp.parse(element.earliestDatestamp.text)
     end
 
     def deleted_record

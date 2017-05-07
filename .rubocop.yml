@@ -7,6 +7,8 @@ Style/DotPosition:
   EnforcedStyle: trailing
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
+Style/EachWithObject:
+  Enabled: false
 Metrics/LineLength:
   Max: 120
 Metrics/ModuleLength:

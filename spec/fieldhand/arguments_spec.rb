@@ -21,7 +21,7 @@ module Fieldhand
       end
 
       it 'allows overriding the metadata prefix with a Metadata Format' do
-        element = Ox.parse('<metadataFormat><metadataPrefix>xoai</metadataPrefix></metadataFormat>')
+        element = ::Ox.parse('<metadataFormat><metadataPrefix>xoai</metadataPrefix></metadataFormat>')
         format = MetadataFormat.new(element)
         arguments = described_class.new(:metadata_prefix => format)
 
@@ -41,13 +41,13 @@ module Fieldhand
       end
 
       it 'converts a Date from datestamp to a string' do
-        arguments = described_class.new(:from => Date.new(2001, 1, 1))
+        arguments = described_class.new(:from => ::Date.new(2001, 1, 1))
 
         expect(arguments.to_query).to include('from' => '2001-01-01')
       end
 
       it 'converts a Time from datestamp to a string' do
-        arguments = described_class.new(:from => Time.utc(2001, 1, 1, 0, 0, 0))
+        arguments = described_class.new(:from => ::Time.utc(2001, 1, 1, 0, 0, 0))
 
         expect(arguments.to_query).to include('from' => '2001-01-01T00:00:00Z')
       end
@@ -59,13 +59,13 @@ module Fieldhand
       end
 
       it 'converts a Date until datestamp to a string' do
-        arguments = described_class.new(:until => Date.new(2001, 1, 1))
+        arguments = described_class.new(:until => ::Date.new(2001, 1, 1))
 
         expect(arguments.to_query).to include('until' => '2001-01-01')
       end
 
       it 'converts a Time until datestamp to a string' do
-        arguments = described_class.new(:until => Time.utc(2001, 1, 1, 0, 0, 0))
+        arguments = described_class.new(:until => ::Time.utc(2001, 1, 1, 0, 0, 0))
 
         expect(arguments.to_query).to include('until' => '2001-01-01T00:00:00Z')
       end
@@ -77,17 +77,17 @@ module Fieldhand
       end
 
       it 'allows passing a Set as a set spec' do
-        element = Ox.parse('<set><setSpec>A</setSpec></set>')
+        element = ::Ox.parse('<set><setSpec>A</setSpec></set>')
         set = Set.new(element)
         arguments = described_class.new(:set => set)
 
         expect(arguments.to_query).to include('set' => 'A')
       end
 
-      it 'ignores unknown arguments' do
+      it 'raises an error when given unknown arguments' do
         arguments = described_class.new(:foo => 'bar')
 
-        expect(arguments.to_query).not_to include(:foo)
+        expect { arguments.to_query }.to raise_error(::ArgumentError)
       end
     end
   end

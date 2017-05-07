@@ -1,8 +1,7 @@
-require 'time'
-require 'date'
+require 'fieldhand/datestamp'
 
 module Fieldhand
-  # A class for converting Fieldhand arguments into OAI-PMH query parameters
+  # A class for converting Fieldhand arguments into OAI-PMH query parameters.
   class Arguments
     VALID_KEYS = {
       :metadata_prefix => 'metadataPrefix',
@@ -19,11 +18,12 @@ module Fieldhand
     end
 
     def to_query
-      options.each_with_object(defaults) do |(key, value), query|
-        next unless VALID_KEYS.key?(key)
+      options.inject(defaults) do |query, (key, value)|
+        raise ::ArgumentError, "unknown argument: #{key}" unless VALID_KEYS.key?(key)
 
-        new_key = VALID_KEYS.fetch(key)
-        query[new_key] = convert_value(key, value)
+        query[VALID_KEYS.fetch(key)] = convert_value(key, value)
+
+        query
       end
     end
 
@@ -35,9 +35,8 @@ module Fieldhand
 
     def convert_value(key, value)
       return value.to_s unless key == :from || key == :until
-      return value if value.is_a?(String)
 
-      value.xmlschema
+      Datestamp.unparse(value)
     end
   end
 end

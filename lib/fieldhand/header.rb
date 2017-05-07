@@ -1,4 +1,4 @@
-require 'time'
+require 'fieldhand/datestamp'
 
 module Fieldhand
   # Contains the unique identifier of the item and properties necessary for selective harvesting. The header consists of
@@ -32,7 +32,7 @@ module Fieldhand
     end
 
     def datestamp
-      @datestamp ||= ::Time.xmlschema(element.datestamp.text)
+      @datestamp ||= Datestamp.parse(element.datestamp.text)
     end
 
     def sets
