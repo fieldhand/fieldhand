@@ -223,9 +223,11 @@ Returns the version of the OAI-PMH protocol supported by the repository as a `St
 ```ruby
 repository.identify.earliest_datestamp
 #=> 2011-01-01 00:00:00 UTC
+repository.identify.earliest_datestamp
+#=> #<Date: 2001-01-01 ((2451911j,0s,0n),+0s,2299161j)>
 ```
 
-Returns the guaranteed lower limit of all datestamps recording changes, modifications, or deletions in the repository as a [`Time`][Time]. Note that the time will be at the finest [granularity](#fieldhandidentifygranularity) supported by the repository.
+Returns the guaranteed lower limit of all datestamps recording changes, modifications, or deletions in the repository as a [`Time`][Time] or [`Date`][Date]. Note that the datestamp will be at the finest [granularity](#fieldhandidentifygranularity) supported by the repository.
 
 #### `Fieldhand::Identify#deleted_record`
 
@@ -378,7 +380,7 @@ repository.records.first.datestamp
 #=> 2011-03-03 16:29:24 UTC
 ```
 
-Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time].
+Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time] or [`Date`][Date] depending on the [granularity](#fieldhandidentifygranularity) of the repository.
 
 #### `Fieldhand::Record#sets`
 
@@ -459,7 +461,7 @@ repository.identifiers.first.datestamp
 #=> 2011-03-03 16:29:24 UTC
 ```
 
-Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time].
+Return the date of creation, modification or deletion of the record for the purpose of selective harvesting as a [`Time`][Time] or [`Date`][Date] depending on the [granularity](#fieldhandidentifygranularity) of the repository.
 
 #### `Fieldhand::Header#sets`
 

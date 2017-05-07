@@ -26,7 +26,7 @@ module Fieldhand
       end
 
       it 'unparses non UTC Times into time-granularity datestamps' do
-        expect(described_class.unparse(::Time.new(2001, 1, 1, 1, 0, 0, '+01:00'))).
+        expect(described_class.unparse(::Time.parse('2001-01-01 01:00:00 +0100'))).
           to eq('2001-01-01T00:00:00Z')
       end
 
