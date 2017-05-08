@@ -286,10 +286,10 @@ Returns the compression encodings supported by the repository as an `Array` of `
 
 ```ruby
 repository.identify.descriptions
-#=> [#<Ox::Element...>]
+#=> ["<description>..."]
 ```
 
-Returns XML elements describing this repository as an `Array` of [`Ox::Element`][Element]s.
+Returns descriptions of this repository as an `Array` of `String`s.
 
 As descriptions can be in any format, Fieldhand doesn't attempt to parse descriptions but leaves parsing to the client.
 
@@ -368,10 +368,10 @@ Return a short human-readable `String` naming the set.
 
 ```ruby
 repository.sets.first.descriptions
-#=> [#<Ox::Element: ...>]
+#=> ["<setDescription>..."]
 ```
 
-Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers that may hold community-specific XML-encoded data about the set.
+Return an `Array` of `String`s of any optional and repeatable containers that may hold community-specific XML-encoded data about the set.
 
 #### `Fieldhand::Set#response_date`
 
@@ -439,10 +439,10 @@ Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memb
 
 ```ruby
 repository.records.first.metadata
-#=> #<Ox::Element: ...>
+#=> "<metadata>..."
 ```
 
-Return a single manifestation of the metadata from a record as [`Ox::Element`][Element]s or `nil` if this is a deleted record.
+Return a single manifestation of the metadata from a record as a `String` or `nil` if this is a deleted record.
 
 As the metadata can be in [any format supported by the repository](#fieldhandrepositorymetadata_formatsidentifier), Fieldhand doesn't attempt to parse the metadata but leaves parsing to the client.
 
@@ -450,10 +450,10 @@ As the metadata can be in [any format supported by the repository](#fieldhandrep
 
 ```ruby
 repository.records.first.about
-#=> [#<Ox::Element: ...>]
+#=> ["<about>..."]
 ```
 
-Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers holding data about the metadata part of the record.
+Return an `Array` of `String`s of any optional and repeatable containers holding data about the metadata part of the record.
 
 #### `Fieldhand::Record#response_date`
 
@@ -585,7 +585,6 @@ This can be used to rescue all the following child error types.
   [Enumerator]: https://ruby-doc.org/core/Enumerator.html
   [Time]: https://ruby-doc.org/core/Time.html
   [URI]: https://ruby-doc.org/stdlib/libdoc/uri/rdoc/URI.html
-  [Element]: http://www.rubydoc.info/github/ohler55/ox/Ox/Element
 
 ## Acknowledgements
 

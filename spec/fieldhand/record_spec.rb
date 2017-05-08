@@ -19,6 +19,22 @@ module Fieldhand
       end
     end
 
+    describe '#metadata' do
+      it 'returns nil if there is no metadata' do
+        element = ::Ox.parse('<record/>')
+        record = described_class.new(element)
+
+        expect(record.metadata).to be_nil
+      end
+
+      it 'returns the metadata as a string' do
+        element = ::Ox.parse('<record><metadata>Foo</metadata></record>')
+        record = described_class.new(element)
+
+        expect(record.metadata).to eq("\n<metadata>Foo</metadata>\n")
+      end
+    end
+
     describe '#about' do
       it 'returns an empty array if there are no about elements' do
         element = ::Ox.parse('<record/>')
@@ -32,6 +48,13 @@ module Fieldhand
         record = described_class.new(element)
 
         expect(record.about.size).to eq(2)
+      end
+
+      it 'returns about sections as strings' do
+        element = ::Ox.parse('<record><about>Foo</about><about>Bar</about></record>')
+        record = described_class.new(element)
+
+        expect(record.about).to contain_exactly("\n<about>Foo</about>\n", "\n<about>Bar</about>\n")
       end
     end
 

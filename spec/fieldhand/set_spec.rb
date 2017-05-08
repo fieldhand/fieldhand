@@ -17,6 +17,14 @@ module Fieldhand
 
         expect(set.descriptions.size).to eq(2)
       end
+
+      it 'returns descriptions as strings' do
+        element = ::Ox.parse('<set><setDescription>Foo</setDescription><setDescription>Bar</setDescription></set>')
+        set = described_class.new(element)
+
+        expect(set.descriptions).
+          to contain_exactly("\n<setDescription>Foo</setDescription>\n", "\n<setDescription>Bar</setDescription>\n")
+      end
     end
 
     describe '#to_s' do

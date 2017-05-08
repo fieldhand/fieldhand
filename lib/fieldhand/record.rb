@@ -1,4 +1,5 @@
 require 'fieldhand/header'
+require 'ox'
 
 module Fieldhand
   # A record is metadata expressed in a single format.
@@ -33,11 +34,11 @@ module Fieldhand
     end
 
     def metadata
-      @metadata ||= element.locate('metadata[0]').first
+      @metadata ||= element.locate('metadata[0]').map { |metadata| Ox.dump(metadata) }.first
     end
 
     def about
-      @about ||= element.locate('about')
+      @about ||= element.locate('about').map { |about| Ox.dump(about) }
     end
 
     def header
