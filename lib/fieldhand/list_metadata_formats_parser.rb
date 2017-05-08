@@ -9,7 +9,7 @@ module Fieldhand
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListMetadataFormats
   class ListMetadataFormatsParser < ::Ox::Sax
     attr_reader :items, :stack
-    attr_accessor :item, :response_date
+    attr_accessor :item, :response_date, :resumption_token
 
     def initialize
       @items = []
@@ -49,6 +49,8 @@ module Fieldhand
         item.schema = URI(str)
       when :metadataNamespace
         item.namespace = URI(str)
+      when :resumptionToken
+        self.resumption_token = str
       end
     end
   end

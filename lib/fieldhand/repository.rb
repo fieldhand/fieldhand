@@ -3,9 +3,9 @@ require 'fieldhand/header'
 require 'fieldhand/logger'
 require 'fieldhand/paginator'
 require 'fieldhand/record'
-require 'fieldhand/set'
 require 'fieldhand/identify_parser'
 require 'fieldhand/list_metadata_formats_parser'
+require 'fieldhand/list_sets_parser'
 require 'uri'
 
 module Fieldhand
@@ -43,9 +43,9 @@ module Fieldhand
       return enum_for(:sets) unless block_given?
 
       paginator.
-        items('ListSets', 'ListSets/set').
-        each do |set, response_date|
-          yield Set.new(set, response_date)
+        sax_items('ListSets', ListSetsParser).
+        each do |set|
+          yield set
         end
     end
 

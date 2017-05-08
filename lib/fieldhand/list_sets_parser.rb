@@ -1,13 +1,12 @@
 require 'fieldhand/datestamp'
-require 'fieldhand/identify'
+require 'fieldhand/set'
 require 'ox'
-require 'uri'
 
 module Fieldhand
-  # A SAX parser for Identify responses that skips parsing description elements.
+  # A SAX parser for ListSets responses that skips parsing set descriptions.
   #
-  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
-  class IdentifyParser < ::Ox::Sax
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListSets
+  class ListSetsParser < ::Ox::Sax
     attr_reader :items, :stack
     attr_accessor :item, :element, :description, :response_date, :resumption_token
 
@@ -23,7 +22,7 @@ module Fieldhand
     end
 
     def inside_description?
-      stack.include?(:description)
+      stack.include?(:setDescription)
     end
 
     def start_element(name)
@@ -32,9 +31,9 @@ module Fieldhand
       self.element = name
 
       case name
-      when :Identify
-        self.item = Identify.new(response_date)
-      when :description
+      when :set
+        self.item = Set.new(response_date)
+      when :setDescription
         self.description = ''
       end
     end
@@ -58,9 +57,9 @@ module Fieldhand
       description << "</#{name}>" if inside_description?
 
       case name
-      when :Identify
+      when :set
         items << item
-      when :description
+      when :setDescription
         item.descriptions << description
       end
     end
@@ -72,22 +71,10 @@ module Fieldhand
         case current_element
         when :responseDate
           self.response_date = Datestamp.parse(str)
-        when :repositoryName
+        when :setSpec
+          item.spec = str
+        when :setName
           item.name = str
-        when :baseURL
-          item.base_url = URI(str)
-        when :protocolVersion
-          item.protocol_version = str
-        when :adminEmail
-          item.admin_emails << str
-        when :earliestDatestamp
-          item.earliest_datestamp = Datestamp.parse(str)
-        when :deletedRecord
-          item.deleted_record = str
-        when :granularity
-          item.granularity = str
-        when :compression
-          item.compression << str
         when :resumptionToken
           self.resumption_token = str
         end

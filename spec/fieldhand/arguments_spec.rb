@@ -77,8 +77,8 @@ module Fieldhand
       end
 
       it 'allows passing a Set as a set spec' do
-        element = ::Ox.parse('<set><setSpec>A</setSpec></set>')
-        set = Set.new(element)
+        set = Set.new
+        set.spec = 'A'
         arguments = described_class.new(:set => set)
 
         expect(arguments.to_query).to include('set' => 'A')

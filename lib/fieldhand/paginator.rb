@@ -45,11 +45,18 @@ module Fieldhand
     def sax_items(verb, parser_class, query = {})
       return enum_for(:sax_items, verb, parser_class, query) unless block_given?
 
-      parser = parser_class.new
-      ::Ox.sax_parse(parser, request(query.merge('verb' => verb)))
+      loop do
+        parser = parser_class.new
+        ::Ox.sax_parse(parser, request(query.merge('verb' => verb)))
 
-      parser.items.each do |item|
-        yield item
+        parser.items.each do |item|
+          yield item
+        end
+
+        break unless parser.resumption_token
+
+        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{parser.resumption_token}" }
+        query = { 'resumptionToken' => parser.resumption_token }
       end
     end
 

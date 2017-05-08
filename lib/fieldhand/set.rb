@@ -3,27 +3,15 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Set
   class Set
-    attr_reader :element, :response_date
+    attr_accessor :response_date, :spec, :name, :descriptions
 
-    def initialize(element, response_date = Time.now)
-      @element = element
+    def initialize(response_date = Time.now)
       @response_date = response_date
+      @descriptions = []
     end
 
     def to_s
       spec
-    end
-
-    def spec
-      @spec ||= element.setSpec.text
-    end
-
-    def name
-      @name ||= element.setName.text
-    end
-
-    def descriptions
-      @descriptions ||= element.locate('setDescription')
     end
   end
 end
