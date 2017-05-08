@@ -45,13 +45,11 @@ module Fieldhand
     def sax_items(verb, parser_class, query = {})
       return enum_for(:sax_items, verb, parser_class, query) unless block_given?
 
-      loop do
-        parser = parser_class.new
-        ::Ox.sax_parse(parser, request(query.merge('verb' => verb)))
+      parser = parser_class.new
+      ::Ox.sax_parse(parser, request(query.merge('verb' => verb)))
 
-        parser.items.each do |item|
-          yield item
-        end
+      parser.items.each do |item|
+        yield item
       end
     end
 

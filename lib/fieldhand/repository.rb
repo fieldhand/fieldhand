@@ -1,11 +1,11 @@
 require 'fieldhand/arguments'
 require 'fieldhand/header'
 require 'fieldhand/logger'
-require 'fieldhand/metadata_format'
 require 'fieldhand/paginator'
 require 'fieldhand/record'
 require 'fieldhand/set'
 require 'fieldhand/identify_parser'
+require 'fieldhand/list_metadata_formats_parser'
 require 'uri'
 
 module Fieldhand
@@ -29,13 +29,13 @@ module Fieldhand
     def metadata_formats(identifier = nil)
       return enum_for(:metadata_formats, identifier) unless block_given?
 
-      arguments = {}
-      arguments['identifier'] = identifier if identifier
+      query = {}
+      query['identifier'] = identifier if identifier
 
       paginator.
-        items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat', arguments).
-        each do |format, response_date|
-          yield MetadataFormat.new(format, response_date)
+        sax_items('ListMetadataFormats', ListMetadataFormatsParser, query).
+        each do |format|
+          yield format
         end
     end
 

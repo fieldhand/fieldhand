@@ -9,13 +9,13 @@ module Fieldhand
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
   class IdentifyParser < ::Ox::Sax
     attr_reader :items, :stack
-    attr_accessor :item, :element, :description
+    attr_accessor :item, :element, :description, :response_date
 
     def initialize
       @items = []
       @element = nil
       @stack = []
-      @item = Identify.new
+      @response_date = Time.now
     end
 
     def current_element
@@ -32,6 +32,8 @@ module Fieldhand
       self.element = name
 
       case name
+      when :Identify
+        self.item = Identify.new(response_date)
       when :description
         self.description = ''
       end
@@ -69,7 +71,7 @@ module Fieldhand
       else
         case current_element
         when :responseDate
-          item.response_date = Datestamp.parse(str)
+          self.response_date = Datestamp.parse(str)
         when :repositoryName
           item.name = str
         when :baseURL

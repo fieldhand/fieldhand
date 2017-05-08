@@ -21,8 +21,8 @@ module Fieldhand
       end
 
       it 'allows overriding the metadata prefix with a Metadata Format' do
-        element = ::Ox.parse('<metadataFormat><metadataPrefix>xoai</metadataPrefix></metadataFormat>')
-        format = MetadataFormat.new(element)
+        format = MetadataFormat.new
+        format.prefix = 'xoai'
         arguments = described_class.new(:metadata_prefix => format)
 
         expect(arguments.to_query).to eq('metadataPrefix' => 'xoai')
