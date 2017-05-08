@@ -6,47 +6,14 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
   class Identify
-    attr_reader :element, :response_date
+    attr_accessor :name, :base_url, :protocol_version, :admin_emails, :earliest_datestamp, :deleted_record,
+                  :granularity, :compression, :descriptions, :response_date
 
-    def initialize(element, response_date = Time.now)
-      @element = element
-      @response_date = response_date
-    end
-
-    def name
-      @name ||= element.repositoryName.text
-    end
-
-    def base_url
-      @base_url ||= URI(element.baseURL.text)
-    end
-
-    def protocol_version
-      @protocol_version ||= element.protocolVersion.text
-    end
-
-    def earliest_datestamp
-      @earliest_datestamp ||= Datestamp.parse(element.earliestDatestamp.text)
-    end
-
-    def deleted_record
-      @deleted_record ||= element.deletedRecord.text
-    end
-
-    def granularity
-      @granularity ||= element.granularity.text
-    end
-
-    def admin_emails
-      @admin_emails ||= element.locate('adminEmail/^String')
-    end
-
-    def compression
-      @compression ||= element.locate('compression/^String')
-    end
-
-    def descriptions
-      @descriptions ||= element.locate('description')
+    def initialize
+      @admin_emails = []
+      @compression = []
+      @descriptions = []
+      @response_date = Time.now
     end
   end
 end

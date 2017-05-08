@@ -20,9 +20,11 @@ RSpec.configure do |config|
   end
 
   def stub_oai_request(uri, fixture)
-    fixtures_dir = File.expand_path('../fixtures', __FILE__)
-
     stub_request(:get, uri).
-      to_return(:body => File.read(File.join(fixtures_dir, fixture)))
+      to_return(:body => fixture(fixture))
+  end
+
+  def fixture(name)
+    File.read(File.join(File.expand_path('../fixtures', __FILE__), name))
   end
 end

@@ -1,11 +1,11 @@
 require 'fieldhand/arguments'
 require 'fieldhand/header'
-require 'fieldhand/identify'
 require 'fieldhand/logger'
 require 'fieldhand/metadata_format'
 require 'fieldhand/paginator'
 require 'fieldhand/record'
 require 'fieldhand/set'
+require 'fieldhand/identify_parser'
 require 'uri'
 
 module Fieldhand
@@ -22,8 +22,7 @@ module Fieldhand
 
     def identify
       paginator.
-        items('Identify', 'Identify').
-        map { |identify, response_date| Identify.new(identify, response_date) }.
+        sax_items('Identify', IdentifyParser).
         first
     end
 

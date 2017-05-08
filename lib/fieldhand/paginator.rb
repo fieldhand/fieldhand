@@ -42,6 +42,19 @@ module Fieldhand
       @http.use_ssl = true if @uri.scheme == 'https'
     end
 
+    def sax_items(verb, parser_class, query = {})
+      return enum_for(:sax_items, verb, parser_class, query) unless block_given?
+
+      loop do
+        parser = parser_class.new
+        ::Ox.sax_parse(parser, request(query.merge('verb' => verb)))
+
+        parser.items.each do |item|
+          yield item
+        end
+      end
+    end
+
     def items(verb, path, query = {}) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       return enum_for(:items, verb, path, query) unless block_given?
 
