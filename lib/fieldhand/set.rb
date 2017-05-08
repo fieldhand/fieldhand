@@ -1,3 +1,5 @@
+require 'ox'
+
 module Fieldhand
   # A set is an optional construct for grouping items for the purpose of selective harvesting.
   #
@@ -23,7 +25,7 @@ module Fieldhand
     end
 
     def descriptions
-      @descriptions ||= element.locate('setDescription')
+      @descriptions ||= element.locate('setDescription').map { |description| Ox.dump(description) }
     end
   end
 end
