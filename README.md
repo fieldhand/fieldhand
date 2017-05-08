@@ -60,14 +60,17 @@ repository.get('oai:www.example.com:12345')
   * [`#admin_emails`](#fieldhandidentifyadmin_emails)
   * [`#compression`](#fieldhandidentifycompression)
   * [`#descriptions`](#fieldhandidentifydescriptions)
+  * [`#response_date`](#fieldhandidentifyresponse_date)
 * [`Fieldhand::MetadataFormat`](#fieldhandmetadataformat)
   * [`#prefix`](#fieldhandmetadataformatprefix)
   * [`#schema`](#fieldhandmetadataformatschema)
   * [`#namespace`](#fieldhandmetadataformatnamespace)
+  * [`#response_date`](#fieldhandmetadataformatresponse_date)
 * [`Fieldhand::Set`](#fieldhandset)
   * [`#spec`](#fieldhandsetspec)
   * [`#name`](#fieldhandsetname)
   * [`#descriptions`](#fieldhandsetdescriptions)
+  * [`#response_date`](#fieldhandsetresponse_date)
 * [`Fieldhand::Record`](#fieldhandrecord)
   * [`#deleted?`](#fieldhandrecorddeleted)
   * [`#status`](#fieldhandrecordstatus)
@@ -76,12 +79,14 @@ repository.get('oai:www.example.com:12345')
   * [`#sets`](#fieldhandrecordsets)
   * [`#metadata`](#fieldhandrecordmetadata)
   * [`#about`](#fieldhandrecordabout)
+  * [`#response_date`](#fieldhandrecordresponse_date)
 * [`Fieldhand::Header`](#fieldhandheader)
   * [`#deleted?`](#fieldhandheaderdeleted)
   * [`#status`](#fieldhandheaderstatus)
   * [`#identifier`](#fieldhandheaderidentifier)
   * [`#datestamp`](#fieldhandheaderdatestamp)
   * [`#sets`](#fieldhandheadersets)
+  * [`#response_date`](#fieldhandheaderresponse_date)
 * [`Fieldhand::NetworkError`](#fieldhandnetworkerror)
 * [`Fieldhand::ProtocolError`](#fieldhandprotocolerror)
   * [`Fieldhand::BadArgumentError`](#fieldhandbadargumenterror)
@@ -288,6 +293,15 @@ Returns XML elements describing this repository as an `Array` of [`Ox::Element`]
 
 As descriptions can be in any format, Fieldhand doesn't attempt to parse descriptions but leaves parsing to the client.
 
+#### `Fieldhand::Identify#response_date`
+
+```ruby
+repository.identify.response_date
+#=> 2017-05-08 11:21:38 +0100
+```
+
+Return the time and date that the response was sent.
+
 ### `Fieldhand::MetadataFormat`
 
 A class to represent a metadata format available from a repository.
@@ -319,6 +333,15 @@ repository.metadata_formats.first.namespace
 
 Return the XML Namespace URI for the format as a [`URI`][URI].
 
+#### `Fieldhand::MetadataFormat#response_date`
+
+```ruby
+repository.metadata_formats.first.response_date
+#=> 2017-05-08 11:21:38 +0100
+```
+
+Return the time and date that the response was sent.
+
 ### `Fieldhand::Set`
 
 A class representing an optional construct for grouping items for the purpose of selective harvesting.
@@ -349,6 +372,15 @@ repository.sets.first.descriptions
 ```
 
 Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers that may hold community-specific XML-encoded data about the set.
+
+#### `Fieldhand::Set#response_date`
+
+```ruby
+repository.sets.first.response_date
+#=> 2017-05-08 11:21:38 +0100
+```
+
+Return the time and date that the response was sent.
 
 ### `Fieldhand::Record`
 
@@ -423,6 +455,15 @@ repository.records.first.about
 
 Return an `Array` of [`Ox::Element`][Element]s of any optional and repeatable containers holding data about the metadata part of the record.
 
+#### `Fieldhand::Record#response_date`
+
+```ruby
+repository.records.first.response_date
+#=> 2017-05-08 11:21:38 +0100
+```
+
+Return the time and date that the response was sent.
+
 ### `Fieldhand::Header`
 
 A class representing the [header](https://www.openarchives.org/OAI/openarchivesprotocol.html#header) of a record:
@@ -483,6 +524,15 @@ repository.identifiers.first.sets
 ```
 
 Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memberships of this record.
+
+#### `Fieldhand::Header#response_date`
+
+```ruby
+repository.identifiers.first.response_date
+#=> 2017-05-08 11:21:38 +0100
+```
+
+Return the time and date that the response was sent.
 
 ### `Fieldhand::NetworkError`
 

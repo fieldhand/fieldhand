@@ -39,5 +39,14 @@ module Fieldhand
         expect(identify.earliest_datestamp).to eq(::Date.new(1990, 2, 1))
       end
     end
+
+    describe '#response_date' do
+      it 'returns the passed response date' do
+        element = ::Ox.parse('<Identify/>')
+        identify = described_class.new(element, ::Time.utc(2001, 1, 1, 0, 0, 0))
+
+        expect(identify.response_date).to eq(::Time.utc(2001, 1, 1, 0, 0, 0))
+      end
+    end
   end
 end

@@ -1,3 +1,4 @@
+require 'fieldhand/datestamp'
 require 'fieldhand/logger'
 require 'ox'
 require 'cgi'
@@ -46,13 +47,14 @@ module Fieldhand
 
       loop do
         document = ::Ox.parse(request(query.merge('verb' => verb)))
+        response_date = document.root.locate('responseDate[0]/^String').map { |date| Datestamp.parse(date) }.first
 
         document.root.locate('error').each do |error|
           convert_error(error)
         end
 
         document.root.locate(path).each do |item|
-          yield item
+          yield item, response_date
         end
 
         resumption_token = document.root.locate('?/resumptionToken/^String').first

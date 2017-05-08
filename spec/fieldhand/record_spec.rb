@@ -34,5 +34,14 @@ module Fieldhand
         expect(record.about.size).to eq(2)
       end
     end
+
+    describe '#response_date' do
+      it 'returns the passed response date' do
+        element = ::Ox.parse('<record/>')
+        record = described_class.new(element, ::Time.utc(2001, 1, 1, 0, 0, 0))
+
+        expect(record.response_date).to eq(::Time.utc(2001, 1, 1, 0, 0, 0))
+      end
+    end
   end
 end
