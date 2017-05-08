@@ -5,11 +5,12 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Record
   class Record
-    attr_reader :element, :response_date
+    attr_accessor :response_date, :header, :metadata, :about
 
-    def initialize(element, response_date = Time.now)
-      @element = element
+    def initialize(response_date = Time.now)
       @response_date = response_date
+      @header = Header.new(response_date)
+      @about = []
     end
 
     def deleted?
@@ -30,18 +31,6 @@ module Fieldhand
 
     def sets
       header.sets
-    end
-
-    def metadata
-      @metadata ||= element.locate('metadata[0]').first
-    end
-
-    def about
-      @about ||= element.locate('about')
-    end
-
-    def header
-      @header ||= Header.new(element.header)
     end
   end
 end

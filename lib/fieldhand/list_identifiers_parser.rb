@@ -1,14 +1,13 @@
 require 'fieldhand/datestamp'
 require 'fieldhand/error'
-require 'fieldhand/metadata_format'
+require 'fieldhand/header'
 require 'ox'
-require 'uri'
 
 module Fieldhand
-  # A SAX parser for ListMetadataFormats responses.
+  # A SAX parser for ListIdentifiers responses.
   #
-  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListMetadataFormats
-  class ListMetadataFormatsParser < ::Ox::Sax
+  # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListIdentifiers
+  class ListIdentifiersParser < ::Ox::Sax
     attr_reader :items, :stack
     attr_accessor :item, :response_date, :resumption_token, :error_code
 
@@ -26,22 +25,25 @@ module Fieldhand
       stack.push(name)
 
       case name
-      when :metadataFormat
-        self.item = MetadataFormat.new(response_date)
+      when :header
+        self.item = Header.new(response_date)
       end
     end
 
     def attr(name, str)
-      return unless name == :code && current_element == :error
-
-      self.error_code = str
+      case name
+      when :status
+        item.status = str
+      when :code
+        self.error_code = str if current_element == :error
+      end
     end
 
     def end_element(name)
       stack.pop
 
       case name
-      when :metadataFormat
+      when :header
         items << item
       end
     end
@@ -54,12 +56,12 @@ module Fieldhand
         Error.convert(error_code, str)
       when :responseDate
         self.response_date = Datestamp.parse(str)
-      when :metadataPrefix
-        item.prefix = str
-      when :schema
-        item.schema = URI(str)
-      when :metadataNamespace
-        item.namespace = URI(str)
+      when :identifier
+        item.identifier = str
+      when :datestamp
+        item.datestamp = Datestamp.parse(str)
+      when :setSpec
+        item.sets << str
       when :resumptionToken
         self.resumption_token = str
       end

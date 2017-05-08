@@ -6,6 +6,8 @@ require 'fieldhand/record'
 require 'fieldhand/identify_parser'
 require 'fieldhand/list_metadata_formats_parser'
 require 'fieldhand/list_sets_parser'
+require 'fieldhand/list_records_parser'
+require 'fieldhand/list_identifiers_parser'
 require 'uri'
 
 module Fieldhand
@@ -22,7 +24,7 @@ module Fieldhand
 
     def identify
       paginator.
-        sax_items('Identify', IdentifyParser).
+        items('Identify', IdentifyParser).
         first
     end
 
@@ -33,7 +35,7 @@ module Fieldhand
       query['identifier'] = identifier if identifier
 
       paginator.
-        sax_items('ListMetadataFormats', ListMetadataFormatsParser, query).
+        items('ListMetadataFormats', ListMetadataFormatsParser, query).
         each do |format|
           yield format
         end
@@ -43,7 +45,7 @@ module Fieldhand
       return enum_for(:sets) unless block_given?
 
       paginator.
-        sax_items('ListSets', ListSetsParser).
+        items('ListSets', ListSetsParser).
         each do |set|
           yield set
         end
@@ -55,9 +57,9 @@ module Fieldhand
       query = Arguments.new(arguments).to_query
 
       paginator.
-        items('ListRecords', 'ListRecords/record', query).
-        each do |record, response_date|
-          yield Record.new(record, response_date)
+        items('ListRecords', ListRecordsParser, query).
+        each do |record|
+          yield record
         end
     end
 
@@ -67,9 +69,9 @@ module Fieldhand
       query = Arguments.new(arguments).to_query
 
       paginator.
-        items('ListIdentifiers', 'ListIdentifiers/header', query).
-        each do |header, response_date|
-          yield Header.new(header, response_date)
+        items('ListIdentifiers', ListIdentifiersParser, query).
+        each do |header|
+          yield header
         end
     end
 
@@ -80,8 +82,7 @@ module Fieldhand
       }
 
       paginator.
-        items('GetRecord', 'GetRecord/record', query).
-        map { |record, response_date| Record.new(record, response_date) }.
+        items('GetRecord', ListRecordsParser, query).
         first
     end
 

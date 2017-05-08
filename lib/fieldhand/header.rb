@@ -1,5 +1,3 @@
-require 'fieldhand/datestamp'
-
 module Fieldhand
   # Contains the unique identifier of the item and properties necessary for selective harvesting. The header consists of
   # the following parts:
@@ -13,31 +11,15 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#header
   class Header
-    attr_reader :element, :response_date
+    attr_accessor :response_date, :status, :identifier, :datestamp, :sets
 
-    def initialize(element, response_date = Time.now)
-      @element = element
+    def initialize(response_date = Time.now)
       @response_date = response_date
+      @sets = []
     end
 
     def deleted?
       status == 'deleted'
-    end
-
-    def status
-      element['status']
-    end
-
-    def identifier
-      @identifier ||= element.identifier.text
-    end
-
-    def datestamp
-      @datestamp ||= Datestamp.parse(element.datestamp.text)
-    end
-
-    def sets
-      @sets ||= element.locate('setSpec/^String')
     end
   end
 end
