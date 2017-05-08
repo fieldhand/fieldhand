@@ -6,10 +6,11 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
   class Identify
-    attr_reader :element
+    attr_reader :element, :response_date
 
-    def initialize(element)
+    def initialize(element, response_date = Time.now)
       @element = element
+      @response_date = response_date
     end
 
     def name

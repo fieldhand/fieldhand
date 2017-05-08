@@ -23,7 +23,7 @@ module Fieldhand
     def identify
       paginator.
         items('Identify', 'Identify').
-        map { |identify| Identify.new(identify) }.
+        map { |identify, response_date| Identify.new(identify, response_date) }.
         first
     end
 
@@ -35,8 +35,8 @@ module Fieldhand
 
       paginator.
         items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat', arguments).
-        each do |format|
-          yield MetadataFormat.new(format)
+        each do |format, response_date|
+          yield MetadataFormat.new(format, response_date)
         end
     end
 
@@ -45,8 +45,8 @@ module Fieldhand
 
       paginator.
         items('ListSets', 'ListSets/set').
-        each do |set|
-          yield Set.new(set)
+        each do |set, response_date|
+          yield Set.new(set, response_date)
         end
     end
 
@@ -57,8 +57,8 @@ module Fieldhand
 
       paginator.
         items('ListRecords', 'ListRecords/record', query).
-        each do |record|
-          yield Record.new(record)
+        each do |record, response_date|
+          yield Record.new(record, response_date)
         end
     end
 
@@ -69,8 +69,8 @@ module Fieldhand
 
       paginator.
         items('ListIdentifiers', 'ListIdentifiers/header', query).
-        each do |header|
-          yield Header.new(header)
+        each do |header, response_date|
+          yield Header.new(header, response_date)
         end
     end
 
@@ -82,7 +82,7 @@ module Fieldhand
 
       paginator.
         items('GetRecord', 'GetRecord/record', query).
-        map { |record| Record.new(record) }.
+        map { |record, response_date| Record.new(record, response_date) }.
         first
     end
 
