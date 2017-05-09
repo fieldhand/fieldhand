@@ -16,12 +16,12 @@ module Fieldhand
       case datestamp
       when ::String
         datestamp
-      when ::Date
-        datestamp.strftime
+      when ::DateTime
+        unparse(::Time.xmlschema(datestamp.to_s))
       when ::Time
         datestamp.utc.xmlschema
       else
-        datestamp.xmlschema
+        datestamp.strftime
       end
     end
   end

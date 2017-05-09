@@ -33,6 +33,10 @@ module Fieldhand
       it 'unparses strings into themselves' do
         expect(described_class.unparse('2001-01-01')).to eq('2001-01-01')
       end
+
+      it 'unparses DateTimes into time-granularity datestamps' do
+        expect(described_class.unparse(::DateTime.new(2001, 1, 1, 0, 0, 0))).to eq('2001-01-01T00:00:00Z')
+      end
     end
   end
 end
