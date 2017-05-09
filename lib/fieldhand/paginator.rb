@@ -1,4 +1,5 @@
 require 'fieldhand/logger'
+require 'fieldhand/response_parser'
 require 'cgi'
 require 'net/http'
 require 'uri'
@@ -31,12 +32,13 @@ module Fieldhand
     # The query defaults to an empty hash but will be merged with the given `verb` when making requests to the
     # repository.
     #
-    # Expects the `parser_class` to respond to `items` and `resumption_token`, returning an `Enumerable` list of items
-    # and an optional string resumption token respectively. The resumption token is used to implement flow control and
-    # is the key to returning _all_ items from the repository.
+    # Expects the `parser_class` to respond to `items`, returning an `Enumerable` list of items that will be yielded to
+    # the caller.
     #
-    # Fieldhand attempts to handle all flow control for the user so they only need handle lazy enumerators and not worry
-    # about pagination and underlying network requests.
+    # Raises a `ProtocolError` for any errors in the response.
+    #
+    # Fieldhand attempts to handle all flow control for the user using resumption tokens from the response so they only
+    # need handle lazy enumerators and not worry about pagination and underlying network requests.
     #
     # # Examples
     #
@@ -51,20 +53,28 @@ module Fieldhand
       return enum_for(:items, verb, parser_class, query) unless block_given?
 
       loop do
-        parser = parser_class.new(request(query.merge('verb' => verb)))
-
-        parser.items.each do |item|
+        response_parser = parse_response(query.merge('verb' => verb))
+        parser_class.new(response_parser).items.each do |item|
           yield item
         end
 
-        break unless parser.resumption_token
+        break unless response_parser.resumption_token
 
-        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{parser.resumption_token}" }
-        query = { 'resumptionToken' => parser.resumption_token }
+        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{response_parser.resumption_token}" }
+        query = { 'resumptionToken' => response_parser.resumption_token }
       end
     end
 
     private
+
+    def parse_response(query = {})
+      response_parser = ResponseParser.new(request(query))
+      response_parser.errors.each do |error|
+        raise error
+      end
+
+      response_parser
+    end
 
     def request(query = {})
       request_uri = uri.dup

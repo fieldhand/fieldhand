@@ -53,12 +53,7 @@ module Fieldhand
 
     # Return the root element of the parsed document.
     def root
-      @root ||= document.root
-    end
-
-    # Return the entire parsed document.
-    def document
-      @document ||= ::Ox.parse(response)
+      @root ||= ::Ox.parse(response).root
     end
 
     private

@@ -33,9 +33,7 @@ module Fieldhand
     #
     # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
     def identify
-      paginator.
-        items('Identify', IdentifyParser).
-        first
+      paginator.items('Identify', IdentifyParser).first
     end
 
     # Send a ListMetadataFormats request to the repository (with an optional identifier) and return an `Enumerator` of
@@ -46,16 +44,10 @@ module Fieldhand
     #
     # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListMetadataFormats
     def metadata_formats(identifier = nil)
-      return enum_for(:metadata_formats, identifier) unless block_given?
-
       query = {}
       query['identifier'] = identifier if identifier
 
-      paginator.
-        items('ListMetadataFormats', ListMetadataFormatsParser, query).
-        each do |format|
-          yield format
-        end
+      paginator.items('ListMetadataFormats', ListMetadataFormatsParser, query)
     end
 
     # Send a ListSets request to the repository and return an `Enumerator` of `Set`s.
@@ -65,13 +57,7 @@ module Fieldhand
     #
     # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListSets
     def sets
-      return enum_for(:sets) unless block_given?
-
-      paginator.
-        items('ListSets', ListSetsParser).
-        each do |set|
-          yield set
-        end
+      paginator.items('ListSets', ListSetsParser)
     end
 
     # Send a ListRecords request to the repository with optional arguments and return an `Enumerator` of `Records`s.
@@ -101,15 +87,9 @@ module Fieldhand
     #
     # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords
     def records(arguments = {})
-      return enum_for(:records, arguments) unless block_given?
-
       query = Arguments.new(arguments).to_query
 
-      paginator.
-        items('ListRecords', ListRecordsParser, query).
-        each do |record|
-          yield record
-        end
+      paginator.items('ListRecords', ListRecordsParser, query)
     end
 
     # Send a ListIdentifiers request to the repository with optional arguments and return an `Enumerator` of `Header`s.
@@ -121,15 +101,9 @@ module Fieldhand
     #
     # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListIdentifiers
     def identifiers(arguments = {})
-      return enum_for(:identifiers, arguments) unless block_given?
-
       query = Arguments.new(arguments).to_query
 
-      paginator.
-        items('ListIdentifiers', ListIdentifiersParser, query).
-        each do |header|
-          yield header
-        end
+      paginator.items('ListIdentifiers', ListIdentifiersParser, query)
     end
 
     # Send a GetRecord request to the repository with the given identifier and optional metadata prefix and return a
@@ -147,9 +121,7 @@ module Fieldhand
         'metadataPrefix' => arguments.fetch(:metadata_prefix, 'oai_dc')
       }
 
-      paginator.
-        items('GetRecord', GetRecordParser, query).
-        first
+      paginator.items('GetRecord', GetRecordParser, query).first
     end
 
     private
