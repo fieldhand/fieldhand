@@ -6,6 +6,7 @@ module Fieldhand
   module Logger
     module_function
 
+    # Return a new `Logger` that logs to the null device on this platform.
     def null
       ::Logger.new(null_device)
     end

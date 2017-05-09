@@ -1,6 +1,6 @@
 require 'fieldhand/arguments'
-require 'fieldhand/set'
 require 'fieldhand/metadata_format'
+require 'fieldhand/set'
 require 'ox'
 require 'date'
 require 'time'

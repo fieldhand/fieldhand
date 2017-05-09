@@ -1,3 +1,8 @@
+require 'fieldhand/get_record_parser'
+require 'fieldhand/identify_parser'
+require 'fieldhand/list_metadata_formats_parser'
+require 'fieldhand/list_records_parser'
+require 'fieldhand/list_sets_parser'
 require 'fieldhand/paginator'
 
 module Fieldhand
@@ -8,7 +13,7 @@ module Fieldhand
                          'bad_argument_error.xml')
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect { paginator.items('Identify', 'Identify', 'bad' => 'Argument').first }.
+        expect { paginator.items('Identify', IdentifyParser, 'bad' => 'Argument').first }.
           to raise_error(BadArgumentError)
       end
 
@@ -17,7 +22,7 @@ module Fieldhand
                          'bad_resumption_token_error.xml')
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect { paginator.items('ListRecords', 'ListRecords/record', 'resumptionToken' => 'foo').first }.
+        expect { paginator.items('ListRecords', ListRecordsParser, 'resumptionToken' => 'foo').first }.
           to raise_error(BadResumptionTokenError)
       end
 
@@ -26,7 +31,7 @@ module Fieldhand
                          'bad_verb_error.xml')
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect { paginator.items('Bad', 'Bad').first }.
+        expect { paginator.items('Bad', IdentifyParser).first }.
           to raise_error(BadVerbError)
       end
 
@@ -35,7 +40,7 @@ module Fieldhand
                          'cannot_disseminate_format_error.xml')
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect { paginator.items('ListRecords', 'ListRecords/record', 'metadataPrefix' => 'bad').first }.
+        expect { paginator.items('ListRecords', ListRecordsParser, 'metadataPrefix' => 'bad').first }.
           to raise_error(CannotDisseminateFormatError)
       end
 
@@ -45,7 +50,7 @@ module Fieldhand
         paginator = described_class.new('http://www.example.com/oai')
 
         expect {
-          paginator.items('GetRecord', 'GetRecord/record', 'metadataPrefix' => 'oai_dc', 'identifier' => 'bad').first
+          paginator.items('GetRecord', GetRecordParser, 'metadataPrefix' => 'oai_dc', 'identifier' => 'bad').first
         }.to raise_error(IdDoesNotExistError)
       end
 
@@ -56,7 +61,7 @@ module Fieldhand
 
         expect {
           paginator.
-            items('ListRecords', 'ListRecords/record', 'metadataPrefix' => 'oai_dc', 'from' => '2999-01-01').
+            items('ListRecords', ListRecordsParser, 'metadataPrefix' => 'oai_dc', 'from' => '2999-01-01').
             first
         }.to raise_error(NoRecordsMatchError)
       end
@@ -67,7 +72,7 @@ module Fieldhand
         paginator = described_class.new('http://www.example.com/oai')
 
         expect {
-          paginator.items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat', 'identifier' => 'bad').first
+          paginator.items('ListMetadataFormats', ListMetadataFormatsParser, 'identifier' => 'bad').first
         }.to raise_error(NoMetadataFormatsError)
       end
 
@@ -76,7 +81,7 @@ module Fieldhand
                          'no_set_hierarchy_error.xml')
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect { paginator.items('ListSets', 'ListSets/set').first }.
+        expect { paginator.items('ListSets', ListSetsParser).first }.
           to raise_error(NoSetHierarchyError)
       end
     end
