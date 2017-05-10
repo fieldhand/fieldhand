@@ -37,6 +37,12 @@ module Fieldhand
       it 'unparses DateTimes into time-granularity datestamps' do
         expect(described_class.unparse(::DateTime.new(2001, 1, 1, 0, 0, 0))).to eq('2001-01-01T00:00:00Z')
       end
+
+      it 'unparses unknown types by calling xmlschema' do
+        datestamp = Struct.new(:xmlschema).new('2001-01-01')
+
+        expect(described_class.unparse(datestamp)).to eq('2001-01-01')
+      end
     end
   end
 end
