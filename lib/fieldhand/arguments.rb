@@ -43,10 +43,10 @@ module Fieldhand
     # Fieldhand::Arguments.new(:metadata_prefix => 'xoai', :from => Date.new(2001, 1, 1)).to_query
     # #=> { "metadataPrefix" => "xoai", "from" => "2001-01-01" }
     #
-    # Fieldhand::Arguments.new(:until => Time.utc(2001, 1, 1, 12, 0, 0).to_query
-    # #=> { "until" => "2001-01-01T12:00:00Z" }
+    # Fieldhand::Arguments.new(:until => Time.utc(2001, 1, 1, 12, 0, 0)).to_query
+    # #=> { "metadataPrefix"=>"oai_dc", "until" => "2001-01-01T12:00:00Z" }
     #
-    # Fieldhand::Arguments.new(:foo => "bar")
+    # Fieldhand::Arguments.new(:foo => "bar").to_query
     # # ArgumentError: unknown argument: foo
     # ```
     def to_query
