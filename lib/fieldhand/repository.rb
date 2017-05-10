@@ -1,11 +1,12 @@
 require 'fieldhand/arguments'
-require 'fieldhand/header'
-require 'fieldhand/identify'
+require 'fieldhand/get_record_parser'
+require 'fieldhand/identify_parser'
+require 'fieldhand/list_identifiers_parser'
+require 'fieldhand/list_metadata_formats_parser'
+require 'fieldhand/list_records_parser'
+require 'fieldhand/list_sets_parser'
 require 'fieldhand/logger'
-require 'fieldhand/metadata_format'
 require 'fieldhand/paginator'
-require 'fieldhand/record'
-require 'fieldhand/set'
 require 'uri'
 
 module Fieldhand
@@ -15,75 +16,112 @@ module Fieldhand
   class Repository
     attr_reader :uri, :logger
 
+    # Return a new repository with the given base URL and an optional logger.
+    #
+    # The base URL can be passed as a `URI` or anything that can be parsed as a URI such as a string.
+    #
+    # Defaults to using a null logger specific to this platform.
     def initialize(uri, logger = Logger.null)
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
       @logger = logger
     end
 
+    # Send an Identify request to the repository and return an `Identify` response.
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#Identify
     def identify
-      paginator.
-        items('Identify', 'Identify').
-        map { |identify, response_date| Identify.new(identify, response_date) }.
-        first
+      paginator.items('Identify', IdentifyParser).first
     end
 
+    # Send a ListMetadataFormats request to the repository (with an optional identifier) and return an `Enumerator` of
+    # `MetadataFormat`s.
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListMetadataFormats
     def metadata_formats(identifier = nil)
-      return enum_for(:metadata_formats, identifier) unless block_given?
+      query = {}
+      query['identifier'] = identifier if identifier
 
-      arguments = {}
-      arguments['identifier'] = identifier if identifier
-
-      paginator.
-        items('ListMetadataFormats', 'ListMetadataFormats/metadataFormat', arguments).
-        each do |format, response_date|
-          yield MetadataFormat.new(format, response_date)
-        end
+      paginator.items('ListMetadataFormats', ListMetadataFormatsParser, query)
     end
 
+    # Send a ListSets request to the repository and return an `Enumerator` of `Set`s.
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListSets
     def sets
-      return enum_for(:sets) unless block_given?
-
-      paginator.
-        items('ListSets', 'ListSets/set').
-        each do |set, response_date|
-          yield Set.new(set, response_date)
-        end
+      paginator.items('ListSets', ListSetsParser)
     end
 
+    # Send a ListRecords request to the repository with optional arguments and return an `Enumerator` of `Records`s.
+    #
+    # The following arguments can be used:
+    #
+    # * :metadata_prefix - The prefix of the metadata format to be used for record metadata, defaults to "oai_dc"
+    # * :from - A `Date`, `Time` or formatted string specifying a lower bound for datestamp-based selective harvesting
+    # * :until - A `Date`, `Time` or formatted string specifying an upper bound for datestamp-based selective harvesting
+    # * :set - A `Set` or string set spec which specifies set criteria for selective harvesting
+    # * :resumption_token - A valid resumption token for resuming a previous request (note that Fieldhand typically
+    #                       handles resumption internally so this should not be normally used)
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # # Examples
+    #
+    # ```
+    # repository = Fieldhand::Repository.new('http://www.example.com/oai')
+    # repository.records.each do |record|
+    #   next if record.deleted?
+    #
+    #   puts record.metadata
+    # end
+    # ```
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords
     def records(arguments = {})
-      return enum_for(:records, arguments) unless block_given?
-
       query = Arguments.new(arguments).to_query
 
-      paginator.
-        items('ListRecords', 'ListRecords/record', query).
-        each do |record, response_date|
-          yield Record.new(record, response_date)
-        end
+      paginator.items('ListRecords', ListRecordsParser, query)
     end
 
+    # Send a ListIdentifiers request to the repository with optional arguments and return an `Enumerator` of `Header`s.
+    #
+    # This supports the same arguments as `Fieldhand::Repository#records` but only returns record headers.
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#ListIdentifiers
     def identifiers(arguments = {})
-      return enum_for(:identifiers, arguments) unless block_given?
-
       query = Arguments.new(arguments).to_query
 
-      paginator.
-        items('ListIdentifiers', 'ListIdentifiers/header', query).
-        each do |header, response_date|
-          yield Header.new(header, response_date)
-        end
+      paginator.items('ListIdentifiers', ListIdentifiersParser, query)
     end
 
+    # Send a GetRecord request to the repository with the given identifier and optional metadata prefix and return a
+    # `Record`.
+    #
+    # Supports passing a :metadata_prefix argument with a given metadata prefix which otherwise defaults to "oai_dc".
+    #
+    # Raises a `NetworkError` if there is an issue contacting the repository or a `ProtocolError` if received in
+    # response.
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#GetRecord
     def get(identifier, arguments = {})
       query = {
         'identifier' => identifier,
         'metadataPrefix' => arguments.fetch(:metadata_prefix, 'oai_dc')
       }
 
-      paginator.
-        items('GetRecord', 'GetRecord/record', query).
-        map { |record, response_date| Record.new(record, response_date) }.
-        first
+      paginator.items('GetRecord', GetRecordParser, query).first
     end
 
     private

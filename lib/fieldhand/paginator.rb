@@ -1,40 +1,24 @@
-require 'fieldhand/datestamp'
 require 'fieldhand/logger'
-require 'ox'
+require 'fieldhand/response_parser'
 require 'cgi'
 require 'net/http'
 require 'uri'
 
 module Fieldhand
   NetworkError = ::Class.new(::StandardError)
-  ProtocolError = ::Class.new(::StandardError)
-  BadArgumentError = ::Class.new(ProtocolError)
-  BadResumptionTokenError = ::Class.new(ProtocolError)
-  BadVerbError = ::Class.new(ProtocolError)
-  CannotDisseminateFormatError = ::Class.new(ProtocolError)
-  IdDoesNotExistError = ::Class.new(ProtocolError)
-  NoRecordsMatchError = ::Class.new(ProtocolError)
-  NoMetadataFormatsError = ::Class.new(ProtocolError)
-  NoSetHierarchyError = ::Class.new(ProtocolError)
 
   # An abstraction over interactions with an OAI-PMH repository, handling requests, responses and paginating over
   # results using a resumption token.
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    ERROR_CODES = {
-      'badArgument' => BadArgumentError,
-      'badResumptionToken' => BadResumptionTokenError,
-      'badVerb' => BadVerbError,
-      'cannotDisseminateFormat' => CannotDisseminateFormatError,
-      'idDoesNotExist' => IdDoesNotExistError,
-      'noRecordsMatch' => NoRecordsMatchError,
-      'noMetadataFormats' => NoMetadataFormatsError,
-      'noSetHierarchy' => NoSetHierarchyError
-    }.freeze
-
     attr_reader :uri, :logger, :http
 
+    # Return a new paginator for the given repository base URI and optional logger.
+    #
+    # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
+    #
+    # The logger will default to a null logger appropriate to this platform.
     def initialize(uri, logger = Logger.null)
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
       @logger = logger
@@ -42,30 +26,55 @@ module Fieldhand
       @http.use_ssl = true if @uri.scheme == 'https'
     end
 
-    def items(verb, path, query = {}) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-      return enum_for(:items, verb, path, query) unless block_given?
+    # Return an `Enumerator` of items retrieved from the repository with the given `verb` and `query`, parsed with the
+    # given `parser_class`.
+    #
+    # The query defaults to an empty hash but will be merged with the given `verb` when making requests to the
+    # repository.
+    #
+    # Expects the `parser_class` to respond to `items`, returning an `Enumerable` list of items that will be yielded to
+    # the caller.
+    #
+    # Raises a `ProtocolError` for any errors in the response.
+    #
+    # Fieldhand attempts to handle all flow control for the user using resumption tokens from the response so they only
+    # need handle lazy enumerators and not worry about pagination and underlying network requests.
+    #
+    # # Examples
+    #
+    # ```
+    # paginator = Fieldhand::Paginator.new('http://www.example.com/oai')
+    # paginator.items('ListRecords', Fieldhand::ListRecordsParser).take(10_000)
+    # #=> [#<Fieldhand::Record: ...>, ...]
+    # ```
+    #
+    # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
+    def items(verb, parser_class, query = {})
+      return enum_for(:items, verb, parser_class, query) unless block_given?
 
       loop do
-        document = ::Ox.parse(request(query.merge('verb' => verb)))
-        response_date = document.root.locate('responseDate[0]/^String').map { |date| Datestamp.parse(date) }.first
-
-        document.root.locate('error').each do |error|
-          convert_error(error)
+        response_parser = parse_response(query.merge('verb' => verb))
+        parser_class.new(response_parser).items.each do |item|
+          yield item
         end
 
-        document.root.locate(path).each do |item|
-          yield item, response_date
-        end
+        break unless response_parser.resumption_token
 
-        resumption_token = document.root.locate('?/resumptionToken/^String').first
-        break unless resumption_token
-
-        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{resumption_token}" }
-        query = { 'resumptionToken' => resumption_token }
+        logger.debug('Fieldhand') { "Resumption token for #{verb}: #{response_parser.resumption_token}" }
+        query = { 'resumptionToken' => response_parser.resumption_token }
       end
     end
 
     private
+
+    def parse_response(query = {})
+      response_parser = ResponseParser.new(request(query))
+      response_parser.errors.each do |error|
+        raise error
+      end
+
+      response_parser
+    end
 
     def request(query = {})
       request_uri = uri.dup
@@ -77,12 +86,6 @@ module Fieldhand
       raise NetworkError, "timeout requesting #{query}: #{e}"
     rescue => e
       raise NetworkError, "error requesting #{query}: #{e}"
-    end
-
-    def convert_error(error)
-      return unless ERROR_CODES.key?(error['code'])
-
-      raise ERROR_CODES.fetch(error['code']), error.text
     end
 
     def encode_query(query = {})
