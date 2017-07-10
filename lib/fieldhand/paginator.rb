@@ -1,12 +1,11 @@
 require 'fieldhand/logger'
+require 'fieldhand/network_error'
 require 'fieldhand/response_parser'
 require 'cgi'
 require 'net/http'
 require 'uri'
 
 module Fieldhand
-  NetworkError = ::Class.new(::StandardError)
-
   # An abstraction over interactions with an OAI-PMH repository, handling requests, responses and paginating over
   # results using a resumption token.
   #
@@ -81,10 +80,14 @@ module Fieldhand
       request_uri.query = encode_query(query)
 
       logger.info('Fieldhand') { "GET #{request_uri}" }
-      http.get(request_uri.request_uri).body
+      res = http.get(request_uri.request_uri)
+      raise NetworkError.new("Invalid response: #{res.code} #{res.msg}", res) unless res.is_a?(::Net::HTTPSuccess)
+
+      res.body
     rescue ::Timeout::Error => e
       raise NetworkError, "timeout requesting #{query}: #{e}"
     rescue => e
+      raise e if e.is_a?(NetworkError)
       raise NetworkError, "error requesting #{query}: #{e}"
     end
 

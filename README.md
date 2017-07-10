@@ -88,6 +88,7 @@ repository.get('oai:www.example.com:12345')
   * [`#sets`](#fieldhandheadersets)
   * [`#response_date`](#fieldhandheaderresponse_date)
 * [`Fieldhand::NetworkError`](#fieldhandnetworkerror)
+  * [`Fieldhand::NetworkError#response`](#fieldhandnetworkerrorresponse)
 * [`Fieldhand::ProtocolError`](#fieldhandprotocolerror)
   * [`Fieldhand::BadArgumentError`](#fieldhandbadargumenterror)
   * [`Fieldhand::BadResumptionTokenError`](#fieldhandbadresumptiontokenerror)
@@ -536,7 +537,25 @@ Return the time and date that the response was sent.
 
 ### `Fieldhand::NetworkError`
 
-An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository. Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
+An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository.  
+If the HTTP request is not successful (returning a status code other than 200), 
+a `NetworkError` exception will be raised containing the error message and the response object.  
+Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
+
+#### Fieldhand::NetworkError#response
+
+```ruby
+begin
+  repository.records.each do |record|
+    # ...
+  end
+rescue Fieldhand::NetworkError => e
+  puts e.response
+  #=> #<Net::HTTPServiceUnavailable 503 Service Unavailable readbody=true>
+end
+```
+
+Returns the unsuccessful `Net::HTTPResponse` that caused this error or `nil` if no response was available.
 
 ### `Fieldhand::ProtocolError`
 
