@@ -2,10 +2,15 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] - 2017-07-10
+### Changed
+- Fieldhand will now raise a Network Error if any response returns unsuccessfully.
+- Network Errors can now contain an HTTP response for use by the user.
+
 ## [0.3.1] - 2017-05-10
 ### Added
 - Added support for passing DateTimes and any object that responds to xmlschema
-  as a datestamp
+  as a datestamp.
 
 ## [0.3.0] - 2017-05-08
 ### Changed
@@ -26,3 +31,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.2.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.2.0
 [0.3.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.3.0
 [0.3.1]: https://github.com/altmetric/fieldhand/releases/tag/v0.3.1
+[0.4.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.4.0
