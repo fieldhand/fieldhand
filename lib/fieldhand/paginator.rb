@@ -1,5 +1,5 @@
 require 'fieldhand/logger'
-require 'fieldhand/network_error'
+require 'fieldhand/network_errors'
 require 'fieldhand/response_parser'
 require 'cgi'
 require 'net/http'
@@ -67,7 +67,10 @@ module Fieldhand
     private
 
     def parse_response(query = {})
-      response_parser = ResponseParser.new(request(query))
+      response = request(query)
+      raise ResponseError, response unless response.is_a?(::Net::HTTPSuccess)
+
+      response_parser = ResponseParser.new(response.body)
       response_parser.errors.each do |error|
         raise error
       end
@@ -80,14 +83,10 @@ module Fieldhand
       request_uri.query = encode_query(query)
 
       logger.info('Fieldhand') { "GET #{request_uri}" }
-      res = http.get(request_uri.request_uri)
-      raise NetworkError.new("Invalid response: #{res.code} #{res.msg}", res) unless res.is_a?(::Net::HTTPSuccess)
-
-      res.body
+      http.get(request_uri.request_uri)
     rescue ::Timeout::Error => e
       raise NetworkError, "timeout requesting #{query}: #{e}"
     rescue => e
-      raise e if e.is_a?(NetworkError)
       raise NetworkError, "error requesting #{query}: #{e}"
     end
 
