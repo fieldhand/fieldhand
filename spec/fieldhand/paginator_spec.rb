@@ -84,6 +84,30 @@ module Fieldhand
         expect { paginator.items('ListSets', ListSetsParser).first }.
           to raise_error(NoSetHierarchyError)
       end
+
+      it 'raises a Response Error if an unsuccessful response is returned' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return(:status => 503, :body => 'Retry after 5 seconds')
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect { paginator.items('Identify', IdentifyParser).first }.
+          to raise_error(ResponseError)
+      end
+
+      it 'raises a Response Error containing a response object' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return(:status => 503, :body => 'Retry after 5 seconds')
+        paginator = described_class.new('http://www.example.com/oai')
+        error = nil
+
+        begin
+          paginator.items('Identify', IdentifyParser).first
+        rescue => e
+          error = e
+        end
+
+        expect(error.response.body).to eq('Retry after 5 seconds')
+      end
     end
   end
 end
