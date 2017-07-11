@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.0] - 2017-07-11
+### Changed
+- Fieldhand will raise a new subclass of Network Error for unexpected
+  responses: Response Error
+
 ## [0.4.0] - 2017-07-10
 ### Changed
 - Fieldhand will now raise a Network Error if any response returns unsuccessfully.
@@ -32,3 +37,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.3.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.3.0
 [0.3.1]: https://github.com/altmetric/fieldhand/releases/tag/v0.3.1
 [0.4.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.4.0
+[0.5.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.5.0

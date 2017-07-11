@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'fieldhand'
-  s.version = '0.4.0'
+  s.version = '0.5.0'
   s.summary = 'An OAI-PMH harvester'
   s.description = <<-EOF
     A library to harvest metadata from OAI-PMH repositories.
