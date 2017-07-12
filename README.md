@@ -540,13 +540,13 @@ Return the time and date that the response was sent.
 
 An error (descended from `StandardError`) to represent any network issues encountered during interaction with the repository. Any underlying exception is exposed in Ruby 2.1 onwards through [`Exception#cause`](https://ruby-doc.org/core-2.1.0/Exception.html#method-i-cause).
 
-#### `Fieldhand::ResponseError`
+### `Fieldhand::ResponseError`
 
-An error (descended from `NetworkError`) to represent any issues in the response from the repository.  
-If the HTTP request is not successful (returning a status code other than 200), 
+An error (descended from `NetworkError`) to represent any issues in the response from the repository.
+If the HTTP request is not successful (returning a status code other than 200),
 a `ResponseError` exception will be raised containing the error message and the response object.
 
-##### Fieldhand::ResponseError#response
+#### `Fieldhand::ResponseError#response`
 
 ```ruby
 begin
@@ -559,11 +559,15 @@ rescue Fieldhand::ResponseError => e
 end
 ```
 
-Returns the unsuccessful `Net::HTTPResponse` that caused this error or `nil` if no response was available.
+Returns the unsuccessful
+[`Net::HTTPResponse`](https://ruby-doc.org/stdlib/libdoc/net/http/rdoc/Net/HTTPResponse.html)
+that caused this error.
 
 ### `Fieldhand::ProtocolError`
 
-The parent error class (descended from `StandardError`) for any errors returned by a repository as defined in the [protocol's Error and Exception Conditions](https://www.openarchives.org/OAI/openarchivesprotocol.html#ErrorConditions).
+The parent error class (descended from `StandardError`) for any errors returned
+by a repository as defined in the [protocol's Error and Exception
+Conditions](https://www.openarchives.org/OAI/openarchivesprotocol.html#ErrorConditions).
 
 This can be used to rescue all the following child error types.
 
