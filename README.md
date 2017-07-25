@@ -2,7 +2,7 @@
 
 A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) repositories.
 
-**Current version:** 0.5.0  
+**Current version:** 0.5.0
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0, 2.1, 2.2
 
 ## Installation
@@ -77,6 +77,7 @@ repository.get('oai:www.example.com:12345')
   * [`#identifier`](#fieldhandrecordidentifier)
   * [`#datestamp`](#fieldhandrecorddatestamp)
   * [`#sets`](#fieldhandrecordsets)
+  * [`#dump`](#fieldhandrecorddump)
   * [`#metadata`](#fieldhandrecordmetadata)
   * [`#about`](#fieldhandrecordabout)
   * [`#response_date`](#fieldhandrecordresponse_date)
@@ -436,6 +437,17 @@ repository.records.first.sets
 ```
 
 Return an `Array` of `String` [set specs](#fieldhandsetspec) indicating set memberships of this record.
+
+#### `Fieldhand::Record#dump`
+
+```ruby
+repository.records.first.dump
+#=> "<record><metadata>...</metadata><record>"
+```
+
+Return the record as a `String` of XML.
+
+As the record can be in [any format supported by the repository](#fieldhandrepositorymetadata_formatsidentifier), Fieldhand doesn't attempt to parse the record but leaves parsing to the client.
 
 #### `Fieldhand::Record#metadata`
 

@@ -45,6 +45,11 @@ module Fieldhand
       header.sets
     end
 
+    # Return this whole item as a string
+    def to_xml
+      Ox.dump(element, :encoding => 'utf-8')
+    end
+
     # Return the single manifestation of the metadata of this item as a string, if present.
     #
     # As metadata can be in any format, Fieldhand does not attempt to parse it but leave that to the user.
