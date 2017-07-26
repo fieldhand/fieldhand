@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'fieldhand/record'
 require 'ox'
 
@@ -32,6 +34,46 @@ module Fieldhand
         record = described_class.new(element)
 
         expect(record.metadata).to eq("\n<metadata>Foo</metadata>\n")
+      end
+
+      it 'returns the metadata with unicode characters as a string' do
+        element = ::Ox.parse('<record><metadata>ψFooϨ</metadata></record>')
+        record = described_class.new(element)
+
+        expect(record.metadata).to eq("\n<metadata>ψFooϨ</metadata>\n")
+      end
+    end
+
+    describe '#to_xml' do
+      it 'returns the whole element even if there is no metadata as a string' do
+        element = ::Ox.parse('<record/>')
+        record = described_class.new(element)
+
+        expect(record.to_xml).to eq("\n<record/>\n")
+      end
+
+      it 'returns the whole element as a string' do
+        element = ::Ox.parse("<record><metadata>Foo</metadata></record>")
+        record = described_class.new(element)
+
+        expect(record.to_xml).to eq(<<-XML)
+
+<record>
+  <metadata>Foo</metadata>
+</record>
+        XML
+      end
+
+      it 'returns the whole element with unicode characters as a string' do
+        element = ::Ox.parse("<record><metadata>ψFooϨ</metadata></record>")
+        record = described_class.new(element)
+
+        expect(record.to_xml).to eq(<<-XML)
+
+<record>
+  <metadata>ψFooϨ</metadata>
+</record>
+        XML
       end
     end
 

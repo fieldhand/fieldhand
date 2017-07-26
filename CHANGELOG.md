@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.0] - 2017-07-26
+### Added
+- Added support for retrieving a Fieldhand record as a string
+- Added unicode character support for retrieving Fieldhand record metadata as a string
+
 ## [0.5.0] - 2017-07-11
 ### Changed
 - Fieldhand will raise a new subclass of Network Error for unexpected
@@ -38,3 +43,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.3.1]: https://github.com/altmetric/fieldhand/releases/tag/v0.3.1
 [0.4.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.4.0
 [0.5.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.5.0
+[0.6.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.6.0
