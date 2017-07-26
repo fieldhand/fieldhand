@@ -35,6 +35,13 @@ module Fieldhand
 
         expect(record.metadata).to eq("\n<metadata>Foo</metadata>\n")
       end
+
+      it 'returns the metadata with unicode characters as a string' do
+        element = ::Ox.parse('<record><metadata>ψFooϨ</metadata></record>')
+        record = described_class.new(element)
+
+        expect(record.metadata).to eq("\n<metadata>ψFooϨ</metadata>\n")
+      end
     end
 
     describe '#to_xml' do

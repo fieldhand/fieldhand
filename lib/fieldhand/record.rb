@@ -54,7 +54,7 @@ module Fieldhand
     #
     # As metadata can be in any format, Fieldhand does not attempt to parse it but leave that to the user.
     def metadata
-      @metadata ||= element.locate('metadata[0]').map { |metadata| Ox.dump(metadata) }.first
+      @metadata ||= element.locate('metadata[0]').map { |metadata| Ox.dump(metadata, :encoding => 'utf-8') }.first
     end
 
     # Return any about elements describing the metadata of this record as an array of strings.
