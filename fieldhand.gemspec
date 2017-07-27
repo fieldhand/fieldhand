@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
     A library to harvest metadata from OAI-PMH repositories.
   EOF
   s.license = 'MIT'
-  s.authors = ['Paul Mucur', 'Maciej Gajewski', 'Giovanni Derks']
+  s.authors = ['Paul Mucur', 'Maciej Gajewski', 'Giovanni Derks', 'Abeer Salameh']
   s.email = 'support@altmetric.com'
   s.homepage = 'https://github.com/altmetric/fieldhand'
   s.files = %w[README.md LICENSE] + Dir['lib/**/*.rb']
