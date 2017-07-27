@@ -59,7 +59,7 @@ module Fieldhand
         expect(record.to_xml).to eq(<<-XML)
 
 <record>
-  <metadata>Foo</metadata>
+<metadata>Foo</metadata>
 </record>
         XML
       end
@@ -71,7 +71,7 @@ module Fieldhand
         expect(record.to_xml).to eq(<<-XML)
 
 <record>
-  <metadata>ψFooϨ</metadata>
+<metadata>ψFooϨ</metadata>
 </record>
         XML
       end
