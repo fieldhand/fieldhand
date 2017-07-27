@@ -33,14 +33,14 @@ module Fieldhand
         element = ::Ox.parse('<record><metadata>Foo</metadata></record>')
         record = described_class.new(element)
 
-        expect(record.metadata).to eq("\n<metadata>Foo</metadata>\n")
+        expect(record.metadata).to eq("<metadata>Foo</metadata>\n")
       end
 
       it 'returns the metadata with unicode characters as a string' do
         element = ::Ox.parse('<record><metadata>ψFooϨ</metadata></record>')
         record = described_class.new(element)
 
-        expect(record.metadata).to eq("\n<metadata>ψFooϨ</metadata>\n")
+        expect(record.metadata).to eq("<metadata>ψFooϨ</metadata>\n")
       end
     end
 
@@ -49,31 +49,21 @@ module Fieldhand
         element = ::Ox.parse('<record/>')
         record = described_class.new(element)
 
-        expect(record.to_xml).to eq("\n<record/>\n")
+        expect(record.to_xml).to eq("<record/>\n")
       end
 
       it 'returns the whole element as a string' do
         element = ::Ox.parse("<record><metadata>Foo</metadata></record>")
         record = described_class.new(element)
 
-        expect(record.to_xml).to eq(<<-XML)
-
-<record>
-  <metadata>Foo</metadata>
-</record>
-        XML
+        expect(record.to_xml).to eq("<record><metadata>Foo</metadata></record>\n")
       end
 
       it 'returns the whole element with unicode characters as a string' do
         element = ::Ox.parse("<record><metadata>ψFooϨ</metadata></record>")
         record = described_class.new(element)
 
-        expect(record.to_xml).to eq(<<-XML)
-
-<record>
-  <metadata>ψFooϨ</metadata>
-</record>
-        XML
+        expect(record.to_xml).to eq("<record><metadata>ψFooϨ</metadata></record>\n")
       end
     end
 
