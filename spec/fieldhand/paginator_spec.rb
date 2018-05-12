@@ -109,5 +109,41 @@ module Fieldhand
         expect(error.response.body).to eq('Retry after 5 seconds')
       end
     end
+
+    describe '#timeout' do
+      it 'defaults to 60 seconds' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.timeout).to eq(60)
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :timeout => 10)
+
+        expect(paginator.timeout).to eq(10)
+      end
+    end
+
+    describe '#logger' do
+      it 'defaults to a null logger' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.logger).to be_a(::Logger)
+      end
+
+      it 'can be overridden with an option' do
+        logger = ::Logger.new(STDOUT)
+        paginator = described_class.new('http://www.example.com/oai', :logger => logger)
+
+        expect(paginator.logger).to eq(logger)
+      end
+
+      it 'can be overridden by passing as a second argument for historic reasons' do
+        logger = ::Logger.new(STDOUT)
+        paginator = described_class.new('http://www.example.com/oai', logger)
+
+        expect(paginator.logger).to eq(logger)
+      end
+    end
   end
 end

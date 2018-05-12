@@ -43,7 +43,7 @@ repository.get('oai:www.example.com:12345')
 ## API Documentation
 
 * [`Fieldhand::Repository`](#fieldhandrepository)
-  * [`.new(uri[, logger])`](#fieldhandrepositorynewuri-logger)
+  * [`.new(uri[, options])`](#fieldhandrepositorynewuri-options)
   * [`#identify`](#fieldhandrepositoryidentify)
   * [`#metadata_formats([identifier])`](#fieldhandrepositorymetadata_formatsidentifier)
   * [`#sets`](#fieldhandrepositorysets)
@@ -109,19 +109,20 @@ A class to represent [an OAI-PMH repository](https://www.openarchives.org/OAI/op
 > requests [...]. A repository is managed by a data provider to expose metadata
 > to harvesters.
 
-#### `Fieldhand::Repository.new(uri[, logger])`
+#### `Fieldhand::Repository.new(uri[, options])`
 
 ```ruby
 Fieldhand::Repository.new('http://www.example.com/oai')
 Fieldhand::Repository.new(URI('http://www.example.com/oai'))
-Fieldhand::Repository.new('http://www.example.com/oai', Logger.new(STDOUT))
+Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10)
 ```
 
 Return a new [`Repository`](#fieldhandrepository) instance accessible at the given `uri` (specified
 either as a [`URI`][URI] or
-something that can be coerced into a `URI` such as a `String`) with an optional
-[`Logger`](http://ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger.html)-compatible
-`logger`.
+something that can be coerced into a `URI` such as a `String`) with two options passed as a `Hash`:
+
+* `:logger`: a [`Logger`](http://ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger.html)-compatible `logger`, defaults to a platform-specific null logger;
+* `:timeout`: a `Numeric` number of seconds to wait before timing out any HTTP requests, defaults to 60.
 
 #### `Fieldhand::Repository#identify`
 

@@ -187,5 +187,41 @@ module Fieldhand
           to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
       end
     end
+
+    describe '#timeout' do
+      it 'defaults to 60 seconds' do
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.timeout).to eq(60)
+      end
+
+      it 'can be overridden with an option' do
+        repository = described_class.new('http://www.example.com/oai', :timeout => 10)
+
+        expect(repository.timeout).to eq(10)
+      end
+    end
+
+    describe '#logger' do
+      it 'defaults to a null logger' do
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.logger).to be_a(::Logger)
+      end
+
+      it 'can be overridden with an option' do
+        logger = ::Logger.new(STDOUT)
+        repository = described_class.new('http://www.example.com/oai', :logger => logger)
+
+        expect(repository.logger).to eq(logger)
+      end
+
+      it 'can be overridden by passing as a second argument for historic reasons' do
+        logger = ::Logger.new(STDOUT)
+        repository = described_class.new('http://www.example.com/oai', logger)
+
+        expect(repository.logger).to eq(logger)
+      end
+    end
   end
 end

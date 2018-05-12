@@ -1,5 +1,5 @@
-require 'fieldhand/logger'
 require 'fieldhand/network_errors'
+require 'fieldhand/options'
 require 'fieldhand/response_parser'
 require 'cgi'
 require 'net/http'
@@ -11,17 +11,23 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :logger, :http
+    attr_reader :uri, :logger, :timeout, :http
 
-    # Return a new paginator for the given repository base URI and optional logger.
+    # Return a new paginator for the given repository base URI and optional logger and timeout.
     #
     # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
     #
-    # The logger will default to a null logger appropriate to this platform.
-    def initialize(uri, logger = Logger.null)
+    # The logger will default to a null logger appropriate to this platform and timeout will default to 60 seconds.
+    def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
-      @logger = logger
+
+      options = Options.new(logger_or_options)
+      @logger = options.logger
+      @timeout = options.timeout
+
       @http = ::Net::HTTP.new(@uri.host, @uri.port)
+      @http.read_timeout = @timeout
+      @http.open_timeout = @timeout
       @http.use_ssl = true if @uri.scheme == 'https'
     end
 
