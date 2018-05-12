@@ -5,7 +5,7 @@ require 'fieldhand/list_identifiers_parser'
 require 'fieldhand/list_metadata_formats_parser'
 require 'fieldhand/list_records_parser'
 require 'fieldhand/list_sets_parser'
-require 'fieldhand/logger'
+require 'fieldhand/options'
 require 'fieldhand/paginator'
 require 'uri'
 
@@ -14,16 +14,22 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html
   class Repository
-    attr_reader :uri, :logger
+    attr_reader :uri, :logger, :timeout
 
-    # Return a new repository with the given base URL and an optional logger.
+    # Return a new repository with the given base URL and an optional logger and timeout.
     #
     # The base URL can be passed as a `URI` or anything that can be parsed as a URI such as a string.
     #
-    # Defaults to using a null logger specific to this platform.
-    def initialize(uri, logger = Logger.null)
+    # For backward compatibility, the second argument can either be a logger or a hash containing
+    # a logger and timeout.
+    #
+    # Defaults to using a null logger specific to this platform and a timeout of 60 seconds.
+    def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
-      @logger = logger
+
+      options = Options.new(logger_or_options)
+      @logger = options.logger
+      @timeout = options.timeout
     end
 
     # Send an Identify request to the repository and return an `Identify` response.
@@ -127,7 +133,7 @@ module Fieldhand
     private
 
     def paginator
-      @paginator ||= Paginator.new(uri, logger)
+      @paginator ||= Paginator.new(uri, :logger => logger, :timeout => timeout)
     end
   end
 end
