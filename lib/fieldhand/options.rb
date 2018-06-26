@@ -16,6 +16,7 @@ module Fieldhand
     # * :logger - A `Logger`-compatible class for logging the activity of the library, defaults to a platform-specific
     #             null logger
     # * :timeout - A `Numeric` number of seconds to wait for any HTTP requests, defaults to 60 seconds
+    # * :bearer_token - A `String` bearer token to use when sending any HTTP requests, defaults to nil
     def initialize(logger_or_options = {})
       @logger_or_options = logger_or_options
     end
@@ -28,6 +29,11 @@ module Fieldhand
     # Return the current logger.
     def logger
       options.fetch(:logger) { Logger.null }
+    end
+
+    # Return the current bearer token.
+    def bearer_token
+      options[:bearer_token]
     end
 
     private

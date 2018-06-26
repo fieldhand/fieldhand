@@ -14,22 +14,23 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html
   class Repository
-    attr_reader :uri, :logger, :timeout
+    attr_reader :uri, :logger, :timeout, :bearer_token
 
-    # Return a new repository with the given base URL and an optional logger and timeout.
+    # Return a new repository with the given base URL and an optional logger, timeout and bearer token.
     #
     # The base URL can be passed as a `URI` or anything that can be parsed as a URI such as a string.
     #
     # For backward compatibility, the second argument can either be a logger or a hash containing
-    # a logger and timeout.
+    # a logger, timeout and bearer token.
     #
-    # Defaults to using a null logger specific to this platform and a timeout of 60 seconds.
+    # Defaults to using a null logger specific to this platform, a timeout of 60 seconds and no bearer token.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
 
       options = Options.new(logger_or_options)
       @logger = options.logger
       @timeout = options.timeout
+      @bearer_token = options.bearer_token
     end
 
     # Send an Identify request to the repository and return an `Identify` response.
@@ -133,7 +134,7 @@ module Fieldhand
     private
 
     def paginator
-      @paginator ||= Paginator.new(uri, :logger => logger, :timeout => timeout)
+      @paginator ||= Paginator.new(uri, :logger => logger, :timeout => timeout, :bearer_token => bearer_token)
     end
   end
 end

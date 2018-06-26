@@ -223,5 +223,29 @@ module Fieldhand
         expect(repository.logger).to eq(logger)
       end
     end
+
+    describe '#bearer_token' do
+      it 'defaults to nil' do
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.bearer_token).to be_nil
+      end
+
+      it 'can be overridden with an option' do
+        repository = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+
+        expect(repository.bearer_token).to eq('decafbad')
+      end
+
+      it 'uses the bearer token to authorize HTTP requests' do
+        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml').
+                    with(:headers => { 'Authorization' => 'Bearer decafbad' })
+        repository = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+
+        repository.identify
+
+        expect(request).to have_been_requested
+      end
+    end
   end
 end
