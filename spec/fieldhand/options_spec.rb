@@ -55,5 +55,19 @@ module Fieldhand
         expect(options.logger).to be_nil
       end
     end
+
+    describe '#bearer_token' do
+      it 'defaults to nil' do
+        options = described_class.new({})
+
+        expect(options.bearer_token).to be_nil
+      end
+
+      it 'can be overridden by passing a token in an option' do
+        options = described_class.new(:bearer_token => 'decafbad')
+
+        expect(options.bearer_token).to eq('decafbad')
+      end
+    end
   end
 end

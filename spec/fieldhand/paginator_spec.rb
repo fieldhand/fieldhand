@@ -145,5 +145,38 @@ module Fieldhand
         expect(paginator.logger).to eq(logger)
       end
     end
+
+    describe '#bearer_token' do
+      it 'defaults to nil' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.bearer_token).to be_nil
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+
+        expect(paginator.bearer_token).to eq('decafbad')
+      end
+
+      it 'sends no authorization header without a bearer token' do
+        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml')
+        paginator = described_class.new('http://www.example.com/oai')
+
+        paginator.items('Identify', IdentifyParser).first
+
+        expect(request).to have_been_requested
+      end
+
+      it 'sends an authorization header with a bearer token' do
+        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml').
+                    with(:headers => { 'Authorization' => 'Bearer decafbad' })
+        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+
+        paginator.items('Identify', IdentifyParser).first
+
+        expect(request).to have_been_requested
+      end
+    end
   end
 end

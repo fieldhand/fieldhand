@@ -11,19 +11,21 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :logger, :timeout, :http
+    attr_reader :uri, :logger, :timeout, :bearer_token, :http
 
-    # Return a new paginator for the given repository base URI and optional logger and timeout.
+    # Return a new paginator for the given repository base URI and optional logger, timeout and bearer token.
     #
     # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
     #
-    # The logger will default to a null logger appropriate to this platform and timeout will default to 60 seconds.
+    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds and the
+    # bearer token will default to nil.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
 
       options = Options.new(logger_or_options)
       @logger = options.logger
       @timeout = options.timeout
+      @bearer_token = options.bearer_token
 
       @http = ::Net::HTTP.new(@uri.host, @uri.port)
       @http.read_timeout = @timeout
@@ -89,7 +91,7 @@ module Fieldhand
       request_uri.query = encode_query(query)
 
       logger.info('Fieldhand') { "GET #{request_uri}" }
-      http.get(request_uri.request_uri)
+      http.request(authenticated_request(request_uri.request_uri))
     rescue ::Timeout::Error => e
       raise NetworkError, "timeout requesting #{query}: #{e}"
     rescue => e
@@ -98,6 +100,13 @@ module Fieldhand
 
     def encode_query(query = {})
       query.map { |k, v| ::CGI.escape(k) << '=' << ::CGI.escape(v) }.join('&')
+    end
+
+    def authenticated_request(uri)
+      request = ::Net::HTTP::Get.new(uri)
+      request['Authorization'] = "Bearer #{bearer_token}" if bearer_token
+
+      request
     end
   end
 end

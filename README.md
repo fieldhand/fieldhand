@@ -114,15 +114,16 @@ A class to represent [an OAI-PMH repository](https://www.openarchives.org/OAI/op
 ```ruby
 Fieldhand::Repository.new('http://www.example.com/oai')
 Fieldhand::Repository.new(URI('http://www.example.com/oai'))
-Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10)
+Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :bearer_token => 'decafbad')
 ```
 
 Return a new [`Repository`](#fieldhandrepository) instance accessible at the given `uri` (specified
 either as a [`URI`][URI] or
-something that can be coerced into a `URI` such as a `String`) with two options passed as a `Hash`:
+something that can be coerced into a `URI` such as a `String`) with three options passed as a `Hash`:
 
 * `:logger`: a [`Logger`](http://ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger.html)-compatible `logger`, defaults to a platform-specific null logger;
-* `:timeout`: a `Numeric` number of seconds to wait before timing out any HTTP requests, defaults to 60.
+* `:timeout`: a `Numeric` number of seconds to wait before timing out any HTTP requests, defaults to 60;
+* `:bearer_token`: a `String` bearer token to authorize any HTTP requests, defaults to `nil`.
 
 #### `Fieldhand::Repository#identify`
 
