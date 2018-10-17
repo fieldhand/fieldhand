@@ -146,22 +146,23 @@ module Fieldhand
       end
     end
 
-    describe '#bearer_token' do
-      it 'defaults to nil' do
+    describe '#headers' do
+      it 'defaults to an empty hash' do
         paginator = described_class.new('http://www.example.com/oai')
 
-        expect(paginator.bearer_token).to be_nil
+        expect(paginator.headers).to be_empty
       end
 
       it 'can be overridden with an option' do
-        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+        paginator = described_class.new('http://www.example.com/oai', :headers => { 'Crossref-Plus-API-Token' => 'Bearer decafbad' })
 
-        expect(paginator.bearer_token).to eq('decafbad')
+        expect(paginator.headers).to eq({ 'Crossref-Plus-API-Token' => 'Bearer decafbad' })
       end
 
-      it 'sends no authorization header without a bearer token' do
-        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml')
-        paginator = described_class.new('http://www.example.com/oai')
+      it 'can add custom headers to HTTP request' do
+        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml').
+                    with(:headers => { 'Crossref-Plus-API-Token' => 'Bearer decafbad' })
+        paginator = described_class.new('http://www.example.com/oai', :headers => { 'Crossref-Plus-API-Token' => 'Bearer decafbad' })
 
         paginator.items('Identify', IdentifyParser).first
 
@@ -170,8 +171,18 @@ module Fieldhand
 
       it 'sends an authorization header with a bearer token' do
         request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml').
-                    with(:headers => { 'Authorization' => 'Bearer decafbad' })
-        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'decafbad')
+                    with(:headers => { 'Authorization' => 'Bearer ewterhtr' })
+        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'ewterhtr')
+
+        paginator.items('Identify', IdentifyParser).first
+
+        expect(request).to have_been_requested
+      end
+
+      it 'can add multiple custom headers to HTTP request' do
+        request = stub_oai_request('http://www.example.com/oai?verb=Identify', 'identify.xml').
+                    with(:headers => { 'Authorization' => 'Bearer ewterhtr', 'Crossref-Plus-API-Token' => 'decafbad' })
+        paginator = described_class.new('http://www.example.com/oai', :bearer_token => 'ewterhtr', :headers => { 'Crossref-Plus-API-Token' => 'decafbad' })
 
         paginator.items('Identify', IdentifyParser).first
 
