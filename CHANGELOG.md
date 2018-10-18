@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.10.0] - 2018-10-18
+### Added
+- Added option to Repository for setting up custom HTTP headers
+
 ## [0.9.0] - 2018-06-26
 ### Added
 - Added option to Repository for HTTP authorization with a bearer token
@@ -59,3 +63,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.7.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.7.0
 [0.8.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.8.0
 [0.9.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.9.0
+[0.10.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.10.0

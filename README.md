@@ -2,19 +2,19 @@
 
 A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) repositories.
 
-**Current version:** 0.9.0  
+**Current version:** 0.10.0  
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0, 2.1, 2.2
 
 ## Installation
 
 ```
-gem install fieldhand -v '~> 0.9'
+gem install fieldhand -v '~> 0.10'
 ```
 
 Or, in your `Gemfile`:
 
 ```ruby
-gem 'fieldhand', '~> 0.9'
+gem 'fieldhand', '~> 0.10'
 ```
 
 ## Usage
