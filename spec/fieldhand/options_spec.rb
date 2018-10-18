@@ -69,5 +69,25 @@ module Fieldhand
         expect(options.bearer_token).to eq('decafbad')
       end
     end
+
+    describe '#headers' do
+      it 'defaults to an empty hash' do
+        options = described_class.new({})
+
+        expect(options.headers).to be_empty
+      end
+
+      it 'can be overridden by passing headers in an option' do
+        options = described_class.new(:headers => { 'Crossref-Plus-API-Token' => 'decafbad' })
+
+        expect(options.headers).to eq({ 'Crossref-Plus-API-Token' => 'decafbad' })
+      end
+
+      it 'overrides authorization headers with a bearer_token' do
+        options = described_class.new(:headers => { 'Authorization' => 'Bearer aaabbbccc' }, :bearer_token => 'decafbad')
+
+        expect(options.headers).to eq({ 'Authorization' => 'Bearer decafbad' })
+      end
+    end
   end
 end

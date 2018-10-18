@@ -17,6 +17,7 @@ module Fieldhand
     #             null logger
     # * :timeout - A `Numeric` number of seconds to wait for any HTTP requests, defaults to 60 seconds
     # * :bearer_token - A `String` bearer token to use when sending any HTTP requests, defaults to nil
+    # * :headers - A `Hash` containing custom HTTP headers, defaults to {}.
     def initialize(logger_or_options = {})
       @logger_or_options = logger_or_options
     end
@@ -34,6 +35,14 @@ module Fieldhand
     # Return the current bearer token.
     def bearer_token
       options[:bearer_token]
+    end
+
+    # Build custom headers
+    def headers
+      headers = options.fetch(:headers, {})
+      headers['Authorization'] = "Bearer #{bearer_token}" if bearer_token
+
+      headers
     end
 
     private

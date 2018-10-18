@@ -11,21 +11,21 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :logger, :timeout, :bearer_token, :http
+    attr_reader :uri, :logger, :timeout, :headers, :http
 
-    # Return a new paginator for the given repository base URI and optional logger, timeout and bearer token.
+    # Return a new paginator for the given repository base URI and optional logger, timeout, bearer token and headers.
     #
     # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
     #
-    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds and the
-    # bearer token will default to nil.
+    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds, the
+    # bearer token will default to nil and headers will default to empty hash.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
 
       options = Options.new(logger_or_options)
       @logger = options.logger
       @timeout = options.timeout
-      @bearer_token = options.bearer_token
+      @headers = options.headers
 
       @http = ::Net::HTTP.new(@uri.host, @uri.port)
       @http.read_timeout = @timeout
@@ -104,7 +104,9 @@ module Fieldhand
 
     def authenticated_request(uri)
       request = ::Net::HTTP::Get.new(uri)
-      request['Authorization'] = "Bearer #{bearer_token}" if bearer_token
+      headers.each do |key, value|
+        request[key] = value
+      end
 
       request
     end
