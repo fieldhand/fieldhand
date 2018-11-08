@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+   <responseDate>2018-11-08T09:33:33Z</responseDate>
+   <request from="2018-11-08" metadataPrefix="marcxml" until="2018-11-08" verb="ListRecords">http://example.com</request>
+   <ListRecords>
+      <oai:record>
+         <oai:header>
+            <oai:identifier>123456</oai:identifier>
+            <oai:datestamp>2018-11-08</oai:datestamp>
+         </oai:header>
+         <oai:metadata>
+            <collection>
+               <record>
+               </record>
+            </collection>
+         </oai:metadata>
+      </oai:record>
+      <oai:record>
+         <oai:header>
+            <oai:identifier>314567</oai:identifier>
+            <oai:datestamp>2018-11-08</oai:datestamp>
+         </oai:header>
+         <oai:metadata>
+            <collection>
+               <record>
+               </record>
+            </collection>
+         </oai:metadata>
+      </oai:record>
+   </ListRecords>
+</OAI-PMH>

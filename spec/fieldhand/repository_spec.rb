@@ -124,6 +124,29 @@ module Fieldhand
 
         repository.records(:from => '2001-01-01', :until => '2002-01-01')
       end
+
+      it 'returns all records for repository with namespace' do
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=marcxml', 'list_records_with_namespaces.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        records = repository.records(:metadata_prefix => 'marcxml').to_a
+        expect(records.size).to eq(2)
+      end
+
+      it 'populates records with the right information for repository with namespace' do
+        stub_oai_request('http://www.example.com/oai?verb=ListRecords&metadataPrefix=marcxml', 'list_records_with_namespaces.xml')
+        repository = described_class.new('http://www.example.com/oai')
+        record = repository.records(:metadata_prefix => 'marcxml').first
+
+        expect(record).to have_attributes(:identifier => '123456',
+                                          :datestamp => ::Date.strptime('2018-11-08'),
+                                          :sets => %w[],
+                                          :deleted? => false,
+                                          :status => nil,
+                                          :about => [],
+                                          :metadata => "<metadata><collection><record/></collection></metadata>\n"
+                                          )
+      end
     end
 
     describe '#identifiers' do
@@ -185,6 +208,15 @@ module Fieldhand
 
         expect(repository.get('oai:oai.datacite.org:32356', :metadata_prefix => 'oai_dc')).
           to have_attributes(:identifier => 'oai:oai.datacite.org:32356')
+      end
+
+      it 'fetches the record by identifier' do
+        stub_oai_request('http://www.example.com/oai?verb=GetRecord&metadataPrefix=marcxml&identifier=123456',
+                         'get_record_with_namespace.xml')
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.get('123456', :metadata_prefix => 'marcxml')).
+          to have_attributes(:identifier => '123456')
       end
     end
 

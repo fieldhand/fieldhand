@@ -115,7 +115,7 @@ A class to represent [an OAI-PMH repository](https://www.openarchives.org/OAI/op
 Fieldhand::Repository.new('http://www.example.com/oai')
 Fieldhand::Repository.new(URI('http://www.example.com/oai'))
 Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :bearer_token => 'decafbad')
-Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :headers => { 'Custom header' => 'decafbad')
+Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :headers => { 'Custom header' => 'decafbad' })
 ```
 
 Return a new [`Repository`](#fieldhandrepository) instance accessible at the given `uri` (specified
@@ -126,7 +126,7 @@ something that can be coerced into a `URI` such as a `String`) with three option
 * `:timeout`: a `Numeric` number of seconds to wait before timing out any HTTP requests, defaults to 60;
 * `:bearer_token`: a `String` bearer token to authorize any HTTP requests, defaults to `nil`.
 * `:headers`: a `Hash` containing custom HTTP headers, defaults to `{}`.
-
+ 
 #### `Fieldhand::Repository#identify`
 
 ```ruby
