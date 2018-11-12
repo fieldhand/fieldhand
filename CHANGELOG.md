@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.11.0] - 2018-11-12
+### Added
+- Support OAI repositories with namespace.
+
 ## [0.10.0] - 2018-10-18
 ### Added
 - Added option to Repository for setting up custom HTTP headers
@@ -64,3 +68,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.8.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.8.0
 [0.9.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.9.0
 [0.10.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.10.0
+[0.11.0]: https://github.com/altmetric/fieldhand/releases/tag/v0.11.0
