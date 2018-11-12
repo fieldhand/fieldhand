@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2018-10-22T06:44:14Z</responseDate>
+  <request verb="GetRecord" identifier="123456" metadataPrefix="marcxml">http://example.com</request>
+  <GetRecord>
+    <oai:record>
+      <oai:header>
+        <oai:identifier>123456</oai:identifier>
+        <oai:datestamp>2004-06-09</oai:datestamp>
+      </oai:header>
+      <oai:metadata>
+        <collection>
+          <record>
+          </record>
+        </collection>
+      </oai:metadata>
+    </oai:record>
+  </GetRecord>
+</OAI-PMH>

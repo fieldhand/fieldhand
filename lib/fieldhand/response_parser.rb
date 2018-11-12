@@ -53,7 +53,7 @@ module Fieldhand
 
     # Return the root element of the parsed document.
     def root
-      @root ||= ::Ox.parse(response).root
+      @root ||= ::Ox.load(response, :strip_namespace => 'oai').root
     end
 
     private
