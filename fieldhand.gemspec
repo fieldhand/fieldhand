@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.authors = ['Paul Mucur', 'Maciej Gajewski', 'Giovanni Derks', 'Abeer Salameh', 'Anna Klimas']
   s.email = 'support@altmetric.com'
-  s.homepage = 'https://github.com/altmetric/fieldhand'
+  s.homepage = 'https://github.com/fieldhand/fieldhand'
   s.files = %w[README.md LICENSE] + Dir['lib/**/*.rb']
   s.test_files = Dir['spec/**/*.rb']
 

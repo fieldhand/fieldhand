@@ -1,4 +1,4 @@
-# Fieldhand [![Build Status](https://travis-ci.org/altmetric/fieldhand.svg?branch=master)](https://travis-ci.org/altmetric/fieldhand)
+# Fieldhand [![Build Status](https://travis-ci.org/fieldhand/fieldhand.svg?branch=master)](https://travis-ci.org/fieldhand/fieldhand)
 
 A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) repositories.
 
@@ -635,6 +635,6 @@ This can be used to rescue all the following child error types.
 
 ## License
 
-Copyright © 2017-2018 Altmetric LLP
+Copyright © 2017-2018 Altmetric and Paul Mucur
 
 Distributed under the MIT License.
