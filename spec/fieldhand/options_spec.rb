@@ -56,6 +56,34 @@ module Fieldhand
       end
     end
 
+    describe '#retries' do
+      it 'defaults to 0' do
+        options = described_class.new({})
+
+        expect(options.retries).to eq(0)
+      end
+
+      it 'can be overridden by passing an option' do
+        options = described_class.new(:retries => 5)
+
+        expect(options.retries).to eq(5)
+      end
+    end
+
+    describe '#interval' do
+      it 'defaults to 10' do
+        options = described_class.new({})
+
+        expect(options.interval).to eq(10)
+      end
+
+      it 'can be overridden by passing an option' do
+        options = described_class.new(:interval => 5)
+
+        expect(options.interval).to eq(5)
+      end
+    end
+
     describe '#bearer_token' do
       it 'defaults to nil' do
         options = described_class.new({})

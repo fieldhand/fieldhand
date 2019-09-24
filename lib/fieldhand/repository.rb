@@ -7,6 +7,7 @@ require 'fieldhand/list_records_parser'
 require 'fieldhand/list_sets_parser'
 require 'fieldhand/options'
 require 'fieldhand/paginator'
+require 'forwardable'
 require 'uri'
 
 module Fieldhand
@@ -14,23 +15,25 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html
   class Repository
-    attr_reader :uri, :logger, :timeout, :headers
+    attr_reader :uri, :logger_or_options
+
+    extend Forwardable
+    def_delegators :paginator, :logger, :timeout, :headers
 
     # Return a new repository with the given base URL and an optional logger, timeout, bearer token and headers.
     #
     # The base URL can be passed as a `URI` or anything that can be parsed as a URI such as a string.
     #
+    # The retries and interval options are passed to the Paginator class.
+    #
     # For backward compatibility, the second argument can either be a logger or a hash containing
-    # a logger, timeout, bearer token and headers.
+    # a logger, timeout, retries, interval, bearer token and headers. Method calls are delgated to Paginator
     #
     # Defaults to using a null logger specific to this platform, a timeout of 60 seconds, no bearer token and no headers.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
 
-      options = Options.new(logger_or_options)
-      @logger = options.logger
-      @timeout = options.timeout
-      @headers = options.headers
+      @logger_or_options = logger_or_options
     end
 
     # Send an Identify request to the repository and return an `Identify` response.
@@ -134,7 +137,7 @@ module Fieldhand
     private
 
     def paginator
-      @paginator ||= Paginator.new(uri, :logger => logger, :timeout => timeout, :headers => headers)
+      @paginator ||= Paginator.new(uri, logger_or_options)
     end
   end
 end

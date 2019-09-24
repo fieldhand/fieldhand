@@ -11,20 +11,25 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :logger, :timeout, :headers, :http
+    attr_reader :uri, :logger, :timeout, :retries, :interval, :headers, :http
+    attr_writer :retries
 
-    # Return a new paginator for the given repository base URI and optional logger, timeout, bearer token and headers.
+    # Return a new paginator for the given repository base URI and optional logger, timeout, retries, interval, bearer token and headers.
     #
     # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
     #
-    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds, the
-    # bearer token will default to nil and headers will default to empty hash.
+    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds, 
+    # retries will default to 0, the sleep interval will default to 10 seconds, the bearer token will default
+    # to nil and headers will default to empty hash.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
 
       options = Options.new(logger_or_options)
+
       @logger = options.logger
       @timeout = options.timeout
+      @retries = options.retries
+      @interval = options.interval
       @headers = options.headers
 
       @http = ::Net::HTTP.new(@uri.host, @uri.port)
@@ -75,15 +80,26 @@ module Fieldhand
     private
 
     def parse_response(query = {})
-      response = request(query)
-      raise ResponseError, response unless response.is_a?(::Net::HTTPSuccess)
-
+      response = retryable_request(query)
       response_parser = ResponseParser.new(response.body)
       response_parser.errors.each do |error|
         raise error
       end
 
       response_parser
+    end
+
+    def retryable_request(query)
+      response = request(query)
+      raise ResponseError, response unless response.is_a?(::Net::HTTPSuccess)
+
+      response
+    rescue ResponseError => e
+      raise e unless retries > 0
+      self.retries -= 1
+
+      sleep(interval)
+      retry
     end
 
     def request(query = {})

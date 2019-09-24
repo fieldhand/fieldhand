@@ -85,10 +85,24 @@ module Fieldhand
           to raise_error(NoSetHierarchyError)
       end
 
-      it 'raises a Response Error if an unsuccessful response is returned' do
+      it 'retries unsuccessful responses' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return(
+            { :status => 503, :body => 'Retry after 5 seconds' },
+            { :status => 500, :body => 'Response error' },
+            { :status => 200, :body => File.read(File.join(FIXTURE_DIR, 'list_identifiers.xml')) }
+          )
+        
+          paginator = described_class.new('http://www.example.com/oai', :retries => 3, :interval => 0.1)
+
+        expect { paginator.items('Identify', IdentifyParser).first }.
+          not_to raise_error
+      end
+
+      it 'raises a Response Error if an unsuccessful response is returned after the last retry attempt' do
         stub_request(:get, 'http://www.example.com/oai?verb=Identify').
           to_return(:status => 503, :body => 'Retry after 5 seconds')
-        paginator = described_class.new('http://www.example.com/oai')
+        paginator = described_class.new('http://www.example.com/oai', :retries => 2, :interval => 0.1)
 
         expect { paginator.items('Identify', IdentifyParser).first }.
           to raise_error(ResponseError)
@@ -143,6 +157,34 @@ module Fieldhand
         paginator = described_class.new('http://www.example.com/oai', logger)
 
         expect(paginator.logger).to eq(logger)
+      end
+    end
+
+    describe '#retries' do
+      it 'defaults to 0' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.retries).to eq(0)
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :retries => 5)
+
+        expect(paginator.retries).to eq(5)
+      end
+    end
+
+    describe '#interval' do
+      it 'defaults to 10' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.interval).to eq(10)
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :interval => 15)
+
+        expect(paginator.interval).to eq(15)
       end
     end
 
