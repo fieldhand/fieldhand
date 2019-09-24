@@ -2,13 +2,13 @@
 
 Gem::Specification.new do |s|
   s.name = 'fieldhand'
-  s.version = '0.11.0'
+  s.version = '0.12.0'
   s.summary = 'An OAI-PMH harvester'
   s.description = <<-EOF
     A library to harvest metadata from OAI-PMH repositories.
   EOF
   s.license = 'MIT'
-  s.authors = ['Paul Mucur', 'Maciej Gajewski', 'Giovanni Derks', 'Abeer Salameh', 'Anna Klimas']
+  s.authors = ['Paul Mucur', 'Maciej Gajewski', 'Giovanni Derks', 'Abeer Salameh', 'Anna Klimas', 'Marco Bagnasco']
   s.email = 'support@altmetric.com'
   s.homepage = 'https://github.com/fieldhand/fieldhand'
   s.files = %w[README.md LICENSE] + Dir['lib/**/*.rb']
