@@ -2,6 +2,7 @@ require 'fieldhand/network_errors'
 require 'fieldhand/options'
 require 'fieldhand/response_parser'
 require 'cgi'
+require 'forwardable'
 require 'net/http'
 require 'uri'
 
@@ -11,25 +12,28 @@ module Fieldhand
   #
   # See https://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
   class Paginator
-    attr_reader :uri, :logger, :timeout, :headers, :http
+    attr_reader :uri, :options, :http
 
-    # Return a new paginator for the given repository base URI and optional logger, timeout, bearer token and headers.
+    extend Forwardable
+    def_delegators :options, :logger, :timeout, :retries, :interval, :headers
+
+    # Return a new paginator for the given repository base URI and optional
+    # logger, timeout, maximum number of retries, retry interval, bearer token
+    # and headers.
     #
     # The URI can be passed as either a `URI` or something that can be parsed as a URI such as a string.
     #
-    # The logger will default to a null logger appropriate to this platform, timeout will default to 60 seconds, the
-    # bearer token will default to nil and headers will default to empty hash.
+    # The logger will default to a null logger appropriate to this platform,
+    # timeout will default to 60 seconds, maximum number of retries will
+    # default to 0, the retry interval will default to 10 seconds, the bearer
+    # token will default to nil and headers will default to empty hash.
     def initialize(uri, logger_or_options = {})
       @uri = uri.is_a?(::URI) ? uri : URI(uri)
-
-      options = Options.new(logger_or_options)
-      @logger = options.logger
-      @timeout = options.timeout
-      @headers = options.headers
+      @options = Options.new(logger_or_options)
 
       @http = ::Net::HTTP.new(@uri.host, @uri.port)
-      @http.read_timeout = @timeout
-      @http.open_timeout = @timeout
+      @http.read_timeout = @options.timeout
+      @http.open_timeout = @options.timeout
       @http.use_ssl = true if @uri.scheme == 'https'
     end
 
@@ -75,15 +79,35 @@ module Fieldhand
     private
 
     def parse_response(query = {})
-      response = request(query)
-      raise ResponseError, response unless response.is_a?(::Net::HTTPSuccess)
-
+      response = retry_request(query)
       response_parser = ResponseParser.new(response.body)
       response_parser.errors.each do |error|
         raise error
       end
 
       response_parser
+    end
+
+    def retry_request(query = {})
+      remaining_retries = retries
+
+      begin
+        ensure_successful_request(query)
+      rescue ResponseError => e
+        raise e unless remaining_retries > 0
+
+        remaining_retries -= 1
+        sleep(interval)
+
+        retry
+      end
+    end
+
+    def ensure_successful_request(query = {})
+      response = request(query)
+      raise ResponseError, response unless response.is_a?(::Net::HTTPSuccess)
+
+      response
     end
 
     def request(query = {})
