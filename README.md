@@ -2,19 +2,19 @@
 
 A Ruby library for harvesting metadata from [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) repositories.
 
-**Current version:** 0.11.0  
-**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0, 2.1, 2.2
+**Current version:** 0.12.0  
+**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6
 
 ## Installation
 
 ```
-gem install fieldhand -v '~> 0.11'
+gem install fieldhand -v '~> 0.12'
 ```
 
 Or, in your `Gemfile`:
 
 ```ruby
-gem 'fieldhand', '~> 0.11'
+gem 'fieldhand', '~> 0.12'
 ```
 
 ## Usage
@@ -116,14 +116,17 @@ Fieldhand::Repository.new('http://www.example.com/oai')
 Fieldhand::Repository.new(URI('http://www.example.com/oai'))
 Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :bearer_token => 'decafbad')
 Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :timeout => 10, :headers => { 'Custom header' => 'decafbad' })
+Fieldhand::Repository.new('http://www.example.com/oai', :logger => Logger.new(STDOUT), :retries => 5, :interval => 30)
 ```
 
 Return a new [`Repository`](#fieldhandrepository) instance accessible at the given `uri` (specified
 either as a [`URI`][URI] or
-something that can be coerced into a `URI` such as a `String`) with three options passed as a `Hash`:
+something that can be coerced into a `URI` such as a `String`) with options passed as a `Hash`:
 
 * `:logger`: a [`Logger`](http://ruby-doc.org/stdlib/libdoc/logger/rdoc/Logger.html)-compatible `logger`, defaults to a platform-specific null logger;
 * `:timeout`: a `Numeric` number of seconds to wait before timing out any HTTP requests, defaults to 60;
+* `:retries`: a `Numeric` number of times an HTTP request will be retried before raising an error, defaults to 0;
+* `:interval`: a `Numeric` number of seconds to wait before the next retry attempt, defaults to 10;
 * `:bearer_token`: a `String` bearer token to authorize any HTTP requests, defaults to `nil`.
 * `:headers`: a `Hash` containing custom HTTP headers, defaults to `{}`.
  

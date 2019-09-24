@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.12.0] - 2019-09-24
+### Added
+- Added option to Repository for setting up configurable retries
+
 ## [0.11.0] - 2018-11-12
 ### Added
 - Support OAI repositories with namespace.
@@ -69,3 +73,4 @@ project adheres to [Semantic Versioning](http://semver.org/).
 [0.9.0]: https://github.com/fieldhand/fieldhand/releases/tag/v0.9.0
 [0.10.0]: https://github.com/fieldhand/fieldhand/releases/tag/v0.10.0
 [0.11.0]: https://github.com/fieldhand/fieldhand/releases/tag/v0.11.0
+[0.12.0]: https://github.com/fieldhand/fieldhand/releases/tag/v0.12.0
