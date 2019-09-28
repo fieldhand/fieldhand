@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/arguments'
 require 'fieldhand/get_record_parser'
 require 'fieldhand/identify_parser'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/network_errors'
 require 'fieldhand/options'
 require 'fieldhand/response_parser'
