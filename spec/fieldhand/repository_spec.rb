@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/repository'
 
 module Fieldhand
@@ -253,6 +255,34 @@ module Fieldhand
         repository = described_class.new('http://www.example.com/oai', logger)
 
         expect(repository.logger).to eq(logger)
+      end
+    end
+
+    describe '#retries' do
+      it 'defaults to 0' do
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.retries).to be_zero
+      end
+
+      it 'can be overridden with an option' do
+        repository = described_class.new('http://www.example.com/oai', :retries => 5)
+
+        expect(repository.retries).to eq(5)
+      end
+    end
+
+    describe '#interval' do
+      it 'defaults to 10' do
+        repository = described_class.new('http://www.example.com/oai')
+
+        expect(repository.interval).to eq(10)
+      end
+
+      it 'can be overridden with an option' do
+        repository = described_class.new('http://www.example.com/oai', :interval => 15)
+
+        expect(repository.interval).to eq(15)
       end
     end
 

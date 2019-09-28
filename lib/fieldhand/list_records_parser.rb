@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/record'
 
 module Fieldhand

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/header'
 
 module Fieldhand

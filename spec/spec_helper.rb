@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 require 'date'
 require 'webmock/rspec'
+
+FIXTURES_DIR = File.expand_path('../fixtures', __FILE__).freeze
 
 RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
@@ -21,9 +25,10 @@ RSpec.configure do |config|
   end
 
   def stub_oai_request(uri, fixture)
-    fixtures_dir = File.expand_path('../fixtures', __FILE__)
+    stub_request(:get, uri).to_return(:body => fixture(fixture))
+  end
 
-    stub_request(:get, uri).
-      to_return(:body => File.read(File.join(fixtures_dir, fixture)))
+  def fixture(fixture)
+    File.read(File.join(FIXTURES_DIR, fixture))
   end
 end

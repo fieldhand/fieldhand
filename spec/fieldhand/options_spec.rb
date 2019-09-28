@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/options'
 
 module Fieldhand
@@ -53,6 +55,34 @@ module Fieldhand
         options = described_class.new(:logger => nil)
 
         expect(options.logger).to be_nil
+      end
+    end
+
+    describe '#retries' do
+      it 'defaults to 0' do
+        options = described_class.new({})
+
+        expect(options.retries).to be_zero
+      end
+
+      it 'can be overridden by passing an option' do
+        options = described_class.new(:retries => 5)
+
+        expect(options.retries).to eq(5)
+      end
+    end
+
+    describe '#interval' do
+      it 'defaults to 10' do
+        options = described_class.new({})
+
+        expect(options.interval).to eq(10)
+      end
+
+      it 'can be overridden by passing an option' do
+        options = described_class.new(:interval => 5)
+
+        expect(options.interval).to eq(5)
       end
     end
 

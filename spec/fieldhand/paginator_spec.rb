@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/get_record_parser'
 require 'fieldhand/identify_parser'
 require 'fieldhand/list_metadata_formats_parser'
@@ -85,10 +87,38 @@ module Fieldhand
           to raise_error(NoSetHierarchyError)
       end
 
+      it 'retries unsuccessful requests' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return({ :status => 503 }, { :status => 500 }, { :status => 200, :body => fixture('identify.xml') })
+
+        paginator = described_class.new('http://www.example.com/oai', :retries => 3, :interval => 0)
+
+        expect(paginator.items('Identify', IdentifyParser).first).to be_a(Identify)
+      end
+
+      it 'retries each unsuccessful request separately' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return({ :status => 500 }, { :status => 200, :body => fixture('identify.xml') }, { :status => 500 }, { :status => 200, :body => fixture('identify.xml') })
+
+        paginator = described_class.new('http://www.example.com/oai', :retries => 1, :interval => 0)
+        paginator.items('Identify', IdentifyParser).first
+
+        expect(paginator.items('Identify', IdentifyParser).first).to be_a(Identify)
+      end
+
       it 'raises a Response Error if an unsuccessful response is returned' do
         stub_request(:get, 'http://www.example.com/oai?verb=Identify').
           to_return(:status => 503, :body => 'Retry after 5 seconds')
         paginator = described_class.new('http://www.example.com/oai')
+
+        expect { paginator.items('Identify', IdentifyParser).first }.
+          to raise_error(ResponseError)
+      end
+
+      it 'raises a Response Error if an unsuccessful response is returned after the last retry attempt' do
+        stub_request(:get, 'http://www.example.com/oai?verb=Identify').
+          to_return({ :status => 500 }, { :status => 500 }, { :status => 500 }, { :status => 200, :body => fixture('identify.xml') })
+        paginator = described_class.new('http://www.example.com/oai', :retries => 2, :interval => 0)
 
         expect { paginator.items('Identify', IdentifyParser).first }.
           to raise_error(ResponseError)
@@ -143,6 +173,34 @@ module Fieldhand
         paginator = described_class.new('http://www.example.com/oai', logger)
 
         expect(paginator.logger).to eq(logger)
+      end
+    end
+
+    describe '#retries' do
+      it 'defaults to 0' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.retries).to be_zero
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :retries => 5)
+
+        expect(paginator.retries).to eq(5)
+      end
+    end
+
+    describe '#interval' do
+      it 'defaults to 10' do
+        paginator = described_class.new('http://www.example.com/oai')
+
+        expect(paginator.interval).to eq(10)
+      end
+
+      it 'can be overridden with an option' do
+        paginator = described_class.new('http://www.example.com/oai', :interval => 15)
+
+        expect(paginator.interval).to eq(15)
       end
     end
 

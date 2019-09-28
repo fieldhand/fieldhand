@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fieldhand/logger'
 
 module Fieldhand
@@ -16,6 +18,8 @@ module Fieldhand
     # * :logger - A `Logger`-compatible class for logging the activity of the library, defaults to a platform-specific
     #             null logger
     # * :timeout - A `Numeric` number of seconds to wait for any HTTP requests, defaults to 60 seconds
+    # * :retries - A `Numeric` maximum number of times a request is retried before erroring, defaults to 0
+    # * :interval - A `Numeric` number of seconds before an erroring request is retried, defaults to 10
     # * :bearer_token - A `String` bearer token to use when sending any HTTP requests, defaults to nil
     # * :headers - A `Hash` containing custom HTTP headers, defaults to {}.
     def initialize(logger_or_options = {})
@@ -30,6 +34,16 @@ module Fieldhand
     # Return the current logger.
     def logger
       options.fetch(:logger) { Logger.null }
+    end
+
+    # Return the current maximum number of retries.
+    def retries
+      options.fetch(:retries, 0)
+    end
+
+    # Return the current retry interval in seconds.
+    def interval
+      options.fetch(:interval, 10)
     end
 
     # Return the current bearer token.
